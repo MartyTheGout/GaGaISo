@@ -97,6 +97,7 @@ ExternalDatasource.swift
 
 # Crendential
 APIKey.swift
+App.Configuration.xcconfig
 
 
 # End of https://www.toptal.com/developers/gitignore/api/swift
