@@ -10,7 +10,13 @@ import KakaoSDKUser
 
 @MainActor
 final class KakaoSignInViewModel: ObservableObject {
-//    
+    
+    let authStore : AuthStore
+    
+    init(authStore: AuthStore) {
+        self.authStore = authStore
+    }
+//
     func kakaoLogin() {
         print("KakaoLoginAvailableCheck")
         print("KakaoTalkLoginAvailableCheck : \(UserApi.isKakaoTalkLoginAvailable())")

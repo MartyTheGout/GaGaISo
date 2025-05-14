@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct KakaoSignInView: View {
-    @StateObject private var viewModel = KakaoSignInViewModel()
+    @StateObject private var viewModel: KakaoSignInViewModel
     // Working Code: resizable() 이 없으면 View가 아주 개똥-이 된다.
+    
+    init(viewModel: KakaoSignInViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
     var body: some View {
         Button {
             viewModel.kakaoLogin()
@@ -18,6 +23,5 @@ struct KakaoSignInView: View {
                 .resizable()
         }
         .frame(height: 55)
-        .padding()
     }
 }

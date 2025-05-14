@@ -14,8 +14,13 @@ struct GaGaISoApp: App {
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
+    let diContainer = DIContainer()
+    
     init() {
-        if UserDefaults.standard.string(forKey: "deviceToken") == nil {
+        let authStore = diContainer.authStore
+        appDelegate.authStore = authStore
+        
+        if authStore.deviceToken == nil {
             let _ = NotificationManager()
         } else {
             print("Device Token already exists: App start without device token registration")
@@ -29,9 +34,10 @@ struct GaGaISoApp: App {
         WindowGroup {
             NavigationStack {
                 LoginView()
+                    .environment(\.diContainer, diContainer)
                     .onOpenURL(perform: { url in
                         if (AuthApi.isKakaoTalkLoginUrl(url)) {
-                            AuthController.handleOpenUrl(url: url)
+                            _ = AuthController.handleOpenUrl(url: url)
                         }
                     })
             }

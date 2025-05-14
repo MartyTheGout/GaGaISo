@@ -7,8 +7,10 @@
 
 import Foundation
 
-protocol TokenStore {
+protocol AbstractAuthStore {
     var accessToken: String? { get set }
     var refreshToken: String? { get set }
+    var loginMethod: String? { get set }
+    var deviceToken: String? { get set }
     func clear()
 }

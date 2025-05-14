@@ -17,8 +17,14 @@ struct LoginResponse: Decodable {
     var refreshToken: String
 }
 
-@MainActor
+
 final class AppleSignInViewModel: ObservableObject {
+    
+    var authStore: AuthStore
+    
+    init(authStore: AuthStore) {
+        self.authStore = authStore
+    }
     
     func handleSuccessfulLogin(with authorization: ASAuthorization) async {
         guard let credential = authorization.credential as? ASAuthorizationAppleIDCredential else {
@@ -31,7 +37,7 @@ final class AppleSignInViewModel: ObservableObject {
         
         if let identityToken = credential.identityToken,
            let tokenString = String(data: identityToken, encoding: .utf8) {
-            let deviceToken = UserDefaults.standard.string(forKey: "deviceToken")
+            let deviceToken = authStore.deviceToken
             
             let nick = NicknameGenerator.generate()
             

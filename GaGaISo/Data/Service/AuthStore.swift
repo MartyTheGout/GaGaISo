@@ -8,10 +8,12 @@
 import Foundation
 import Security
 
-final class KeychainTokenHandler: TokenStore {
+final class AuthStore: AbstractAuthStore {
     
     private let accessTokenKey = "accessToken"
     private let refreshTokenKey = "refreshToken"
+    private let deviceTokenKey = "deviceToken"
+    private let loginMethodKey = "loginMethod"
     
     var accessToken: String? {
         get { load(forKey: accessTokenKey) }
@@ -35,9 +37,33 @@ final class KeychainTokenHandler: TokenStore {
         }
     }
     
+    var loginMethod: String? {
+        get { load(forKey: loginMethodKey) }
+        set {
+            if let value = newValue {
+                save(value, forKey: loginMethodKey)
+            } else {
+                delete(forKey: loginMethodKey)
+            }
+        }
+    }
+    
+    var deviceToken: String? {
+        get { load(forKey: deviceTokenKey) }
+        set {
+            if let value = newValue {
+                save(value, forKey: deviceTokenKey)
+            } else {
+                delete(forKey: deviceTokenKey)
+            }
+        }
+    }
+               
     func clear() {
         delete(forKey: accessTokenKey)
         delete(forKey: refreshTokenKey)
+        delete(forKey: deviceTokenKey)
+        delete(forKey: loginMethodKey)
     }
     
     // MARK: - Low-level keychain

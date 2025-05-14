@@ -8,7 +8,20 @@ import SwiftUI
 import AuthenticationServices
 
 struct AppleSignInView: View {
-    @StateObject private var viewModel = AppleSignInViewModel()
+    // 되는 것 
+    @StateObject private var viewModel: AppleSignInViewModel
+    
+    init(viewModel: AppleSignInViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
+    // 안되는 것
+//    @Environment(\.diContainer) var diContainer
+//    @StateObject private var viewModel: AppleSignInViewModel
+//    
+//    init() {
+//        self.viewModel = StateObject(wrappedValue: AppleSignInViewModel(authStore: diContainer.authStore))
+//    }
     
     var body: some View {
         SignInWithAppleButton(.signIn) { request in
@@ -24,6 +37,5 @@ struct AppleSignInView: View {
             }
         }
         .frame(height: 50)
-        .padding()
     }
 }
