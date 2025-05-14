@@ -40,7 +40,7 @@ struct LoginView: View {
             
             
             VStack(alignment: .leading, spacing: 12) {
-                Text("아이디")
+                Text("이메일")
                     .pretendardFont(size: .body1, weight: .bold)
                     .foregroundStyle(.gray75)
                 
@@ -139,14 +139,6 @@ struct LoginView: View {
             SignUpView()
                 .navigationTitle("회원가입")
                 .navigationBarTitleDisplayMode(.inline)
-        }
-        .onAppear() {
-            for family in UIFont.familyNames {
-                print("📦 Font Family: \(family)")
-                for name in UIFont.fontNames(forFamilyName: family) {
-                    print("    🔤 Font Name: \(name)")
-                }
-            }
         }
     }
 }

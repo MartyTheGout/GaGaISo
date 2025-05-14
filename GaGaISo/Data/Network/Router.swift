@@ -7,10 +7,10 @@
 
 import Foundation
 
-enum TestRouter: RouterProtocol {
-    case v1AuthRefresh(refreshToken: String)
+enum AuthenticationRouter: RouterProtocol {
+    case v1AuthRefresh(accessToken: String, refreshToken: String)
     case v1ValidateEmail(email: String)
-    case v1EmailJoin(email: String, password: String, nick: String, phoneNum: String, deviceToken: String)
+    case v1EmailJoin(email: String, password: String, nick: String, phoneNum: String?, deviceToken: String?)
     case v1EmailLogin(email: String, password: String, deviceToken: String)
     case v1KakaoLogin(oauthToken: String, deviceToken: String)
     case v1AppleLogin(idToken: String, deviceToken: String, nick: String)
@@ -37,10 +37,6 @@ enum TestRouter: RouterProtocol {
     
     var parameter : [URLQueryItem] {
         switch self {
-        case .v1AuthRefresh(let refreshToken) :
-            return [
-                URLQueryItem(name: "RefreshToken", value: refreshToken) ,
-            ]
         default: return []
         }
     }
@@ -104,6 +100,24 @@ enum TestRouter: RouterProtocol {
         }
     }
     
+    var headers: [String: String] {
+        switch self {
+        case .v1AuthRefresh(let accessToken, let refreshToken):
+            return [
+                "Content-Type": "application/json",
+                "Authorization": "\(accessToken)",
+                "RefreshToken": "\(refreshToken)",
+                "SeSACKey": APIKey.PICKUP
+            ]
+            
+        default:
+            return [
+                "Content-Type": "application/json",
+                "SeSACKey": APIKey.PICKUP
+            ]
+        }
+    }
+    
     var urlRequest: URLRequest {
         var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
         components?.queryItems = parameter.isEmpty ? nil : parameter
@@ -114,11 +128,14 @@ enum TestRouter: RouterProtocol {
         
         var request = URLRequest(url: url)
         request.httpMethod = method
-            if let body = body {
-                request.httpBody = body
-                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.setValue(APIKey.PICKUP, forHTTPHeaderField: "SeSACKey")
-            }
+        if let body = body {
+            request.httpBody = body
+        }
+        
+        for (key, value) in headers {
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+        
         return request
     }
 }

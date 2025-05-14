@@ -8,10 +8,19 @@
 import SwiftUI
 
 struct SignUpView: View {
+    
+    enum SignUpField: Hashable {
+        case email, password, confirmPassword, nickname
+    }
+    
+    @FocusState private var focusedField: SignUpField?
+    
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
     @State private var nickname: String = ""
+    
+    @StateObject private var useCase = RegistrationUsecase()
     
     var body: some View {
         VStack(spacing: 20) {
@@ -21,21 +30,35 @@ struct SignUpView: View {
                 .jalnanFont(size: .title1)
                 .foregroundStyle(.gray75)
             
-            Text("아이디와 비밀번호 입력해주세요")
+            Text("이메일와 비밀번호 입력해주세요")
                 .jalnanFont(size: .title1)
                 .foregroundStyle(.gray90)
                 .padding(.bottom, 24)
             
             Group {
-                InputField(title: "아이디", text: $email, isSecure: false)
-                InputField(title: "비밀번호", text: $password, isSecure: true)
-                InputField(title: "비밀번호 확인", text: $confirmPassword, isSecure: true)
-                InputField(title: "닉네임", text: $nickname, isSecure: false)
+                InputField(title: "이메일", text: $email, errorMessage: "유효한 이메일 형식이 아닙니다.",  isSecure: false, verificationHandler: { value in
+                    return useCase.isValidEmail(value)
+                }, focusedField: $focusedField, currentField: .email)
+                
+                InputField(title: "비밀번호", text: $password, errorMessage: "최소 8자 이상, 영문, 숫자, 특수문자(@$!%*#?&)를 포함해야합니다.", isSecure: true, verificationHandler: { value in
+                    return useCase.isValidPassword(value)
+                }, focusedField: $focusedField, currentField: .password)
+                
+                InputField(title: "비밀번호 확인", text: $confirmPassword, errorMessage: "비밀번호가 일치하지 않습니다.",isSecure: true, verificationHandler: { value in
+                    return value == password
+                }, focusedField: $focusedField, currentField: .confirmPassword)
+                
+                InputField(title: "닉네임", text: $nickname, errorMessage: "., ,, ?, *, -, @ 는 사용할 수 없습니다.", isSecure: false, verificationHandler: { value in
+                    return useCase.isValidNickname(value)
+                }, focusedField: $focusedField, currentField: .nickname)
             }
             .padding(.horizontal, 32)
             
             Button(action: {
-                // 회원가입 처리 로직
+                Task {
+                    await useCase.register(email: email, password: password, nickname: nickname, completion: {})
+                }
+                
             }) {
                 Text("회원가입")
                     .fontWeight(.bold)
@@ -55,23 +78,40 @@ struct SignUpView: View {
     }
 }
 
-// MARK: - Custom Input Field
 struct InputField: View {
     let title: String
     @Binding var text: String
+    let errorMessage: String
     var isSecure: Bool = false
+    let verificationHandler: (String) -> Bool
+    
+    @FocusState.Binding var focusedField: SignUpView.SignUpField?
+    let currentField: SignUpView.SignUpField
+    
+    @State private var isTouched: Bool = false
+    @State private var isValid: Bool = true
     
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .pretendardFont(size: .body1, weight: .bold)
-                .foregroundStyle(.gray75)
+            HStack {
+                Text(title)
+                    .pretendardFont(size: .body1, weight: .bold)
+                    .foregroundStyle(.gray75)
+                
+                Spacer()
+                
+                if !isValid && isTouched {
+                    Text(errorMessage)
+                        .pretendardFont(size: .caption2, weight: .bold)
+                        .foregroundStyle(.red)
+                }
+            }
             
             Group {
                 if isSecure {
-                    SecureField("", text: $text)
+                    SecureField("", text: $text).focused($focusedField, equals: currentField)
                 } else {
-                    TextField("", text: $text)
+                    TextField("", text: $text).focused($focusedField, equals: currentField)
                 }
             }
             .padding()
@@ -83,6 +123,15 @@ struct InputField: View {
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.gray.opacity(0.4), lineWidth: 1)
             )
+            .onChange(of: focusedField) { newValue in
+                if newValue == currentField {
+                    isTouched = true
+                } else {
+                    if isTouched {
+                        isValid = verificationHandler(text)
+                    }
+                }
+            }
         }
     }
 }

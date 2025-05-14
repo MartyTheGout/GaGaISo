@@ -9,12 +9,12 @@ import Foundation
 import KakaoSDKUser
 
 final class KakaoSignInViewModel: ObservableObject {
-    let authStore : AuthStore
+    let authManager : AuthenticationManager
     
-    init(authStore: AuthStore) {
-        self.authStore = authStore
+    init(authManager: AuthenticationManager) {
+        self.authManager = authManager
     }
-
+    
     func kakaoLogin() {
         if UserApi.isKakaoTalkLoginAvailable() {
             UserApi.shared.loginWithKakaoTalk { oauthToken, error in
@@ -29,23 +29,33 @@ final class KakaoSignInViewModel: ObservableObject {
                         print("카카오톡 로그인 success")
                     }
                 }
-             }
-         } else {
+            }
+        } else {
             UserApi.shared.loginWithKakaoAccount { oauthToken, error in
                 if let error = error {
-                    print(error)
-                } else {
-                    print("카카오계정 로그인 success")
-
-                   _ = oauthToken
+                    print("❌ Kakao 계정 로그인 실패: \(error)")
+                } else if let accessToken = oauthToken?.accessToken {
+                    Task {
+                        await self.requestLoginWithKakaoOauth(oauthToken: accessToken)
+                    }
                 }
             }
         }
     }
     
     func requestLoginWithKakaoOauth(oauthToken: String) async {
+        let nick = NicknameGenerator.generate()
+        
+        await authManager.loginWithKakao(oauthToken: oauthToken) { success in
+            if success {
+                print("✅ Kakao 로그인 성공")
+            } else {
+                print("❌ Kakao 로그인 실패 (서버 응답)")
+            }
+        }
+        
         let deviceToken = UserDefaults.standard.string(forKey: "deviceToken") ?? ""
-        let response = await NetworkHandler.request(TestRouter.v1KakaoLogin(oauthToken: oauthToken, deviceToken: deviceToken), type: LoginResponse.self)
+        let response = await NetworkHandler.request(AuthenticationRouter.v1KakaoLogin(oauthToken: oauthToken, deviceToken: deviceToken), type: LoginResponse.self)
         dump(response)
     }
 }

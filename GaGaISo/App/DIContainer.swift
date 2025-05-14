@@ -9,18 +9,20 @@ import Foundation
 
 final class DIContainer {
     let authStore: AuthStore
+    let authManager: AuthenticationManager
 
     init() {
         self.authStore = AuthStore()
+        self.authManager = AuthenticationManager(authStore: authStore)
     }
     
     @MainActor
     func getAppleSignViewModel() -> AppleSignInViewModel {
-        return AppleSignInViewModel(authStore: authStore)
+        return AppleSignInViewModel(authManager: authManager)
     }
     
     @MainActor
     func getKaKaoSignViewModel() -> KakaoSignInViewModel {
-        return KakaoSignInViewModel(authStore: authStore)
+        return KakaoSignInViewModel(authManager: authManager)
     }
 }
