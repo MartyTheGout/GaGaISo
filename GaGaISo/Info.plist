@@ -20,5 +20,12 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>JalnanGothic.otf</string>
+		<string>Pretendard-Regular.otf</string>
+		<string>Pretendard-Bold.otf</string>
+		<string></string>
+	</array>
 </dict>
 </plist>
