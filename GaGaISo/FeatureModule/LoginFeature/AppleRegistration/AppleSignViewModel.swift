@@ -19,7 +19,6 @@ struct LoginResponse: Decodable {
 
 
 final class AppleSignInViewModel: ObservableObject {
-    
     var authStore: AuthStore
     
     init(authStore: AuthStore) {
@@ -31,17 +30,12 @@ final class AppleSignInViewModel: ObservableObject {
             print("❌ 인증 정보가 올바르지 않습니다.")
             return
         }
-
-        print("============== 성공 ==============")
-        print("user: \(credential.user)")
         
         if let identityToken = credential.identityToken,
            let tokenString = String(data: identityToken, encoding: .utf8) {
             let deviceToken = authStore.deviceToken
             
             let nick = NicknameGenerator.generate()
-            
-            print("identityToken (JWT): \(tokenString)")
             
             let response = await NetworkHandler.request(
                 TestRouter.v1AppleLogin(
@@ -63,8 +57,6 @@ final class AppleSignInViewModel: ObservableObject {
         if credential.authorizedScopes.contains(.email) {
             print("email: \(credential.email ?? "없음")")
         }
-
-        print("==================================")
     }
     
     func handleLoginError(with error: Error) {
