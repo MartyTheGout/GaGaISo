@@ -136,7 +136,7 @@ struct LoginView: View {
         .background(.brightSprout)
         .edgesIgnoringSafeArea(.all)
         .navigationDestination(isPresented: $isShowingSignUp) {
-            SignUpView()
+            SignUpView(usecase: diContainer.getRegistrationUsecase())
                 .navigationTitle("회원가입")
                 .navigationBarTitleDisplayMode(.inline)
         }

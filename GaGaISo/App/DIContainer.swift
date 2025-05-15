@@ -10,10 +10,12 @@ import Foundation
 final class DIContainer {
     let authStore: AuthStore
     let authManager: AuthenticationManager
+    let networkClient: RawNetworkClient
 
     init() {
         self.authStore = AuthStore()
-        self.authManager = AuthenticationManager(authStore: authStore)
+        self.networkClient = RawNetworkClient()
+        self.authManager = AuthenticationManager(authStore: authStore, networkClient: networkClient)
     }
     
     @MainActor
@@ -23,6 +25,11 @@ final class DIContainer {
     
     @MainActor
     func getKaKaoSignViewModel() -> KakaoSignInViewModel {
-        return KakaoSignInViewModel(authManager: authManager)
+        return KakaoSignInViewModel(authManager: authManager )
+    }
+    
+    @MainActor
+    func getRegistrationUsecase() -> RegistrationUsecase {
+        return RegistrationUsecase(networkClient: networkClient)
     }
 }

@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct SignUpView: View {
+    @Environment(\.diContainer) var diContainer
+    @StateObject private var useCase: RegistrationUsecase
+    
+    init(usecase: RegistrationUsecase) {
+        _useCase = StateObject(wrappedValue: usecase)
+    }
     
     enum SignUpField: Hashable {
         case email, password, confirmPassword, nickname
@@ -19,8 +25,6 @@ struct SignUpView: View {
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
     @State private var nickname: String = ""
-    
-    @StateObject private var useCase = RegistrationUsecase()
     
     var body: some View {
         VStack(spacing: 20) {
@@ -134,8 +138,4 @@ struct InputField: View {
             }
         }
     }
-}
-
-#Preview {
-    SignUpView()
 }

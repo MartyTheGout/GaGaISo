@@ -12,11 +12,10 @@ struct AppEntryView: View {
     
     var body: some View {
         NavigationStack {
-            if authManager.isLoggedIn {
-                ContentView()
-            } else {
-                LoginView()
-            }
+            ContentView()
+                .fullScreenCover(isPresented: .constant(!authManager.isLoggedIn)) {
+                    LoginView()
+                }
         }
         .onAppear {
             Task {

@@ -11,6 +11,12 @@ class RegistrationUsecase: ObservableObject {
     
     @Published var isLoading = false
     
+    let networkClient: RawNetworkClient
+    
+    init(networkClient: RawNetworkClient) {
+        self.networkClient = networkClient
+    }
+    
     func isValidPassword(_ password: String) -> Bool {
         let passwordRegex = #"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"#
         return NSPredicate(format: "SELF MATCHES %@", passwordRegex).evaluate(with: password)
@@ -28,7 +34,7 @@ class RegistrationUsecase: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         
-        let response = await NetworkHandler.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil), type: LoginResponse.self)
+        let response = await networkClient.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil).urlRequest, responseType: LoginResponse.self)
         
         switch response {
         case .success:

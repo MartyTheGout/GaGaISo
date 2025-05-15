@@ -55,7 +55,8 @@ final class KakaoSignInViewModel: ObservableObject {
         }
         
         let deviceToken = UserDefaults.standard.string(forKey: "deviceToken") ?? ""
-        let response = await NetworkHandler.request(AuthenticationRouter.v1KakaoLogin(oauthToken: oauthToken, deviceToken: deviceToken), type: LoginResponse.self)
-        dump(response)
+        await authManager.loginWithKakao(oauthToken: oauthToken, completion: {_ in 
+            print("")
+        })
     }
 }

@@ -11,6 +11,7 @@ enum APIError: Error, CustomStringConvertible {
     case invalidResponse(statusCode: Int, url: URL?, body: String?)
     case decodingError(Error)
     case unknown(Error)
+    case unauthorized(statusCode: Int, url: URL?, body: String?)
 
     var description: String {
         switch self {
@@ -25,6 +26,13 @@ enum APIError: Error, CustomStringConvertible {
             return "[APIError.decodingError] Decoding error: \(error)"
         case .unknown(let error):
             return "[APIError.unknown] Unknown error: \(error)"
+        case .unauthorized(let statusCode, let url, let body):
+            return """
+            [APIError.unauthorized]
+            - Status Code: \(statusCode)
+            - URL: \(url?.absoluteString ?? "nil")
+            - Body: \(body ?? "nil")
+            """
         }
     }
     
@@ -44,7 +52,9 @@ enum APIError: Error, CustomStringConvertible {
             return "requiredDBer\n 담당자가 확인 중입니다. 불편을 끼쳐 죄송합니다."
         case .unknown(let error):
             print(error)
-            return "unkown\n담당자가 확인 중입니다. 불편을 끼쳐 죄송합니다."
+            return "unknown\n담당자가 확인 중입니다. 불편을 끼쳐 죄송합니다."
+        case .unauthorized:
+            return "unauthorized\n유효한 인증값이 아닙니다. 다시 로그인해주세요."
         }
     }
 }

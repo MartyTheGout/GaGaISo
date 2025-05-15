@@ -10,56 +10,46 @@ import Foundation
 final class AuthenticationManager: ObservableObject {
     @Published var isLoggedIn: Bool = false
     
+    private let client: RawNetworkClient
+    
     private let authStore: AuthStore
     private let deviceToken : String?
     
-    init(authStore: AuthStore ) {
+    init(authStore: AuthStore, networkClient: RawNetworkClient ) {
         self.authStore = authStore
         self.deviceToken = authStore.deviceToken
+        self.client = networkClient
     }
     
     func bootstrap() async {
-        guard let accessToken = authStore.accessToken, let refreshToken = authStore.refreshToken else {
-            print("There is no accessToken in keyChain")
-            await logout()
-            return
-        }
-        
-        print("Refresh Process is working ")
-        await tryRefresh(accessToken: accessToken, refreshToken: refreshToken)
+        await tryRefreshIfNeeded()
     }
     
-    func tryRefresh(accessToken: String, refreshToken: String) async {
-        let response = await NetworkHandler.request(AuthenticationRouter.v1AuthRefresh(accessToken: accessToken, refreshToken: refreshToken), type: TokenRefresheResponse.self)
-        switch response {
-        case .success(let response) :
-            saveTokenToStore(response.accessToken, response.refreshToken)
-            await setLoginState(true)
+    @discardableResult
+    func tryRefreshIfNeeded() async -> Bool {
+        guard let accessToken = authStore.accessToken,
+              let refreshToken = authStore.refreshToken else {
+            return false
+        }
+        let request = AuthenticationRouter.v1AuthRefresh(accessToken: accessToken, refreshToken: refreshToken).urlRequest
+        let result: Result<TokenRefresheResponse, APIError> = await client.request(request, responseType: TokenRefresheResponse.self)
+        
+        switch result {
             
-        case.failure(let error):
-            print("❗️ accessToken 만료됨. refresh 시도")
-            print(error)
+        case .success(let tokens):
+            authStore.accessToken = tokens.accessToken
+            authStore.refreshToken = tokens.refreshToken
+            await MainActor.run { self.isLoggedIn = true }
+            return true
+        case .failure:
             await logout()
-        }
-    }
-    
-    func register(email: String, password: String, nickname: String, completion: @escaping () -> Void) async  {
-        let response = await NetworkHandler.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil), type: LoginResponse.self)
-        
-        switch response {
-        case .success(let result):
-            saveTokenToStore(result.accessToken, result.refreshToken)
-            completion()
-        case .failure(let error):
-            print(error)
+            return false
         }
     }
     
     func saveTokenToStore(_ accessToken: String, _ refreshToken: String) {
         authStore.accessToken = accessToken
         authStore.refreshToken = refreshToken
-        print(authStore.accessToken)
-        print(authStore.refreshToken)
     }
     
     func logout() async {
@@ -77,15 +67,15 @@ final class AuthenticationManager: ObservableObject {
 //MARK: - Sign up with Apple
 extension AuthenticationManager {
     func loginWithApple(idToken: String, nick: String, completion: @escaping (Bool) -> Void) async {
-        let response = await NetworkHandler.request(
+        let response = await client.request(
             AuthenticationRouter.v1AppleLogin(
                 idToken: idToken,
                 deviceToken: deviceToken ?? "",
                 nick: nick
-            ),
-            type: LoginResponse.self
+            ).urlRequest,
+            responseType: LoginResponse.self
         )
-
+        
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
@@ -107,14 +97,14 @@ extension AuthenticationManager {
         oauthToken: String,
         completion: @escaping (Bool) -> Void
     ) async {
-        let response = await NetworkHandler.request(
+        let response = await client.request(
             AuthenticationRouter.v1KakaoLogin(
                 oauthToken: oauthToken,
                 deviceToken: deviceToken ?? ""
-            ),
-            type: LoginResponse.self
+            ).urlRequest,
+            responseType: LoginResponse.self
         )
-
+        
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
@@ -124,6 +114,40 @@ extension AuthenticationManager {
             print("❌ Kakao Login 실패: \(error)")
             completion(false)
             await setLoginState(false)
+        }
+    }
+}
+
+//MARK: - Sign up
+extension AuthenticationManager {
+    func loginWithEmail(
+        email: String,
+        password: String
+    ) async {
+        let response = await client.request(
+            AuthenticationRouter.v1EmailLogin(email: email, password: password, deviceToken: deviceToken ?? "" ).urlRequest,
+            responseType: LoginResponse.self
+        )
+        
+        switch response {
+        case .success(let result):
+            saveTokenToStore(result.accessToken, result.refreshToken)
+            await setLoginState(true)
+        case .failure(let error):
+            print("❌ Email Login 실패: \(error)")
+            await setLoginState(false)
+        }
+    }
+    
+    func register(email: String, password: String, nickname: String, completion: @escaping () -> Void) async  {
+        let response = await client.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil).urlRequest, responseType: LoginResponse.self)
+        
+        switch response {
+        case .success(let result):
+            saveTokenToStore(result.accessToken, result.refreshToken)
+            completion()
+        case .failure(let error):
+            print(error)
         }
     }
 }

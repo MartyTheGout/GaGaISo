@@ -77,7 +77,7 @@ enum AuthenticationRouter: RouterProtocol {
             ]
             return try? JSONSerialization.data(withJSONObject: dict)
         case .v1UserProfile:
-            return nil  // GET 요청이므로 body 없음
+            return nil
         }
     }
     
@@ -128,6 +128,7 @@ enum AuthenticationRouter: RouterProtocol {
         
         var request = URLRequest(url: url)
         request.httpMethod = method
+        
         if let body = body {
             request.httpBody = body
         }
