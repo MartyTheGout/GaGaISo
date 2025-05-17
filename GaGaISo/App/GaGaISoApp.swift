@@ -8,16 +8,15 @@
 import SwiftUI
 import KakaoSDKCommon
 import KakaoSDKAuth
+import ComposableArchitecture
+
 
 @main
 struct GaGaISoApp: App {
-    
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    let diContainer = DIContainer()
-    
     init() {
-        let authStore = diContainer.authStore
+        @Dependency(\.authStore) var authStore
         appDelegate.authStore = authStore
         
         if authStore.deviceToken == nil {
@@ -32,14 +31,16 @@ struct GaGaISoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            AppEntryView()
-                .environmentObject(diContainer.authManager)
-                .environment(\.diContainer, diContainer)
-                .onOpenURL(perform: { url in
-                    if AuthApi.isKakaoTalkLoginUrl(url) {
-                        _ = AuthController.handleOpenUrl(url: url)
-                    }
-                })
+            AppEntryView(
+                store: Store(initialState: AppFeature.State()) {
+                    AppFeature()
+                }
+            )
+            .onOpenURL(perform: { url in
+                if AuthApi.isKakaoTalkLoginUrl(url) {
+                    _ = AuthController.handleOpenUrl(url: url)
+                }
+            })
         }
     }
 }

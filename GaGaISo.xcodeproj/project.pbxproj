@@ -11,6 +11,7 @@
 		407D272E2DD342110043F141 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 407D272D2DD342110043F141 /* KakaoSDK */; };
 		407D27302DD342110043F141 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 407D272F2DD342110043F141 /* KakaoSDKAuth */; };
 		407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 407D27312DD342110043F141 /* KakaoSDKCommon */; };
+		40C059842DD75A080012671F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 40C059832DD75A080012671F /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 			files = (
 				407D272E2DD342110043F141 /* KakaoSDK in Frameworks */,
 				407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */,
+				40C059842DD75A080012671F /* ComposableArchitecture in Frameworks */,
 				407D27302DD342110043F141 /* KakaoSDKAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -93,6 +95,7 @@
 				407D272D2DD342110043F141 /* KakaoSDK */,
 				407D272F2DD342110043F141 /* KakaoSDKAuth */,
 				407D27312DD342110043F141 /* KakaoSDKCommon */,
+				40C059832DD75A080012671F /* ComposableArchitecture */,
 			);
 			productName = GaGaISo;
 			productReference = 407D26712DD32AE90043F141 /* GaGaISo.app */;
@@ -124,6 +127,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				407D272C2DD342110043F141 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
+				40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 407D26722DD32AE90043F141 /* Products */;
@@ -297,7 +301,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -336,7 +340,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -386,6 +390,14 @@
 				minimumVersion = 2.24.2;
 			};
 		};
+		40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.19.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -403,6 +415,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 407D272C2DD342110043F141 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKCommon;
+		};
+		40C059832DD75A080012671F /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

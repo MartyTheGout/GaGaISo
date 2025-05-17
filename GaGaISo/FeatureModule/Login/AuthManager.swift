@@ -66,7 +66,7 @@ final class AuthenticationManager: ObservableObject {
 
 //MARK: - Sign up with Apple
 extension AuthenticationManager {
-    func loginWithApple(idToken: String, nick: String, completion: @escaping (Bool) -> Void) async {
+    func loginWithApple(idToken: String, nick: String) async {
         let response = await client.request(
             AuthenticationRouter.v1AppleLogin(
                 idToken: idToken,
@@ -81,11 +81,9 @@ extension AuthenticationManager {
             saveTokenToStore(result.accessToken, result.refreshToken)
             dump(result)
             await setLoginState(true)
-            completion(true)
             
         case .failure(let error):
             print("❌ Apple Login 실패: \(error)")
-            completion(false)
             await setLoginState(false)
         }
     }
@@ -93,10 +91,7 @@ extension AuthenticationManager {
 
 //MARK: - Sign up with Kakao
 extension AuthenticationManager {
-    func loginWithKakao(
-        oauthToken: String,
-        completion: @escaping (Bool) -> Void
-    ) async {
+    func loginWithKakao(oauthToken: String) async {
         let response = await client.request(
             AuthenticationRouter.v1KakaoLogin(
                 oauthToken: oauthToken,
@@ -109,10 +104,9 @@ extension AuthenticationManager {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
             await setLoginState(true)
-            completion(true)
+            
         case .failure(let error):
             print("❌ Kakao Login 실패: \(error)")
-            completion(false)
             await setLoginState(false)
         }
     }
@@ -139,13 +133,14 @@ extension AuthenticationManager {
         }
     }
     
-    func register(email: String, password: String, nickname: String, completion: @escaping () -> Void) async  {
+    func register(email: String, password: String, nickname: String) async  {
         let response = await client.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil).urlRequest, responseType: LoginResponse.self)
         
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
-            completion()
+            await setLoginState(true)
+            
         case .failure(let error):
             print(error)
         }

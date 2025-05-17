@@ -29,13 +29,7 @@ final class AppleSignInViewModel: ObservableObject {
 
         let nick = NicknameGenerator.generate()
 
-        await authManager.loginWithApple(idToken: tokenString, nick: nick) { success in
-            if success {
-                print("✅ Apple 로그인 성공")
-            } else {
-                print("❌ Apple 로그인 실패")
-            }
-        }
+        await authManager.loginWithApple(idToken: tokenString, nick: nick) 
     }
 
     func handleLoginError(with error: Error) {
