@@ -7,8 +7,11 @@
 
 import SwiftUI
 import ComposableArchitecture
+import Toasts
 
 struct LoginView: View {
+    @Environment(\.presentToast) var presentToast
+    
     let store: StoreOf<LoginFeature>
     
     var body: some View {
@@ -161,6 +164,16 @@ struct LoginView: View {
                 SignUpView(store: store.scope(state: \.signUp, action: \.signUp))
                     .navigationTitle("회원가입")
                     .navigationBarTitleDisplayMode(.inline)
+            }
+            .onChange(of: viewStore.errorMessage) { _, newErrorMessage in
+                if let errorMessage = newErrorMessage {
+                    let toast = ToastValue(
+                        icon: Image(systemName: "exclamationmark.triangle"),
+                        message: errorMessage,
+                        duration: 3.0
+                    )
+                    presentToast(toast)
+                }
             }
         }
     }

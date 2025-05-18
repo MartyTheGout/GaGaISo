@@ -46,7 +46,13 @@ struct AppleSignInFeature {
                 let nick = NicknameGenerator.generate()
                 
                 return .run { send in
-                    await authManager.loginWithApple(idToken: tokenString, nick: nick)
+                    let serverLoginResponse = await authManager.loginWithApple(idToken: tokenString, nick: nick)
+                    switch serverLoginResponse {
+                    case .success:
+                        await send(.loginProcessed)
+                    case .failure(let error):
+                        await send(.loginFailed(error.localizedDescription))
+                    }
                     await send(.loginProcessed)
                 }
                 

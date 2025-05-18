@@ -11,7 +11,17 @@ import ComposableArchitecture
 struct AppEntryView: View {
     let store: StoreOf<AppFeature>
     
-    @Dependency(\.authManager) var authManager
+
+    
+    @Dependency(\.authManager) private var authManagerDependency
+        @ObservedObject private var authManager: AuthenticationManager
+        
+        init(store: StoreOf<AppFeature>) {
+            self.store = store
+        
+            let manager = AuthManagerKey.liveValue
+            self._authManager = ObservedObject(wrappedValue: manager)
+        }
     
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
@@ -27,7 +37,12 @@ struct AppEntryView: View {
                                 action: \.content
                             )
                         )
-                        .fullScreenCover(isPresented: .constant(!authManager.isLoggedIn)) {
+                        .fullScreenCover(isPresented:
+                                            Binding(
+                                                get: { !self.authManager.isLoggedIn },
+                                                set: { _ in }
+                                            )
+                        ) {
                             NavigationStack {
                                 LoginView(
                                     store: store.scope(

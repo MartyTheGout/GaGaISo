@@ -9,20 +9,29 @@ import SwiftUI
 import KakaoSDKCommon
 import KakaoSDKAuth
 import ComposableArchitecture
-
+import Toasts
 
 @main
 struct GaGaISoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
+    //testMode
+    var forceLoginProcess = true
+    
     init() {
         @Dependency(\.authStore) var authStore
+        
         appDelegate.authStore = authStore
         
         if authStore.deviceToken == nil {
             let _ = NotificationManager()
         } else {
             print("Device Token already exists: App start without device token registration")
+        }
+        
+        if forceLoginProcess {
+            authStore.accessToken = nil
+            authStore.refreshToken = nil
         }
         
         let kakaoNativeAppKey = APIKey.KAKAO_NATIVE_APP_KEY
@@ -41,6 +50,7 @@ struct GaGaISoApp: App {
                     _ = AuthController.handleOpenUrl(url: url)
                 }
             })
+            .installToast(position: .bottom)
         }
     }
 }

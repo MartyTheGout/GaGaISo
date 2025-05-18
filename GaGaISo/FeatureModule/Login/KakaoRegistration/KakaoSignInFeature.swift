@@ -72,10 +72,12 @@ struct KakaoSignInFeature {
                 
             case let .kakaoLoginSuccess(accessToken):
                 return .run { send in
-                    do {
-                        try await authManager.loginWithKakao(oauthToken: accessToken)
+                    let serverLogInResponse = await authManager.loginWithKakao(oauthToken: accessToken)
+                    
+                    switch serverLogInResponse {
+                    case .success:
                         await send(.loginProcessed)
-                    } catch {
+                    case .failure(let error):
                         await send(.loginFailed(error.localizedDescription))
                     }
                 }

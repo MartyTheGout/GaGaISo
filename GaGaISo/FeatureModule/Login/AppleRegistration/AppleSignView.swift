@@ -8,8 +8,11 @@
 import SwiftUI
 import AuthenticationServices
 import ComposableArchitecture
+import Toasts
 
 struct AppleSignInView: View {
+    @Environment(\.presentToast) private var presentToast
+    
     let store: StoreOf<AppleSignInFeature>
     
     var body: some View {
@@ -31,21 +34,17 @@ struct AppleSignInView: View {
                     ProgressView()
                 }
             }
-            .alert(
-                "로그인 오류",
-                isPresented: .init(
-                    get: { viewStore.errorMessage != nil },
-                    set: { if !$0 { viewStore.send(.loginFailed("")) } }
-                ),
-                actions: {
-                    Button("확인") {}
-                },
-                message: {
-                    if let errorMessage = viewStore.errorMessage {
-                        Text(errorMessage)
-                    }
+            .onChange(of: viewStore.errorMessage) { _, newErrorMessage in
+                if let errorMessage = newErrorMessage {
+                    let toast = ToastValue (
+                        icon: Image(systemName: "exclamationmark.triangle"),
+                        message: errorMessage,
+                        duration: 3.0
+                    )
+                    presentToast(toast)
                 }
-            )
+                
+            }
         }
     }
 }

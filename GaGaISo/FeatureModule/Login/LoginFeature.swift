@@ -15,6 +15,9 @@ struct LoginFeature {
         var password: String = ""
         var isShowingSignUp = false
         
+        var isLoading = false
+        var errorMessage: String?
+        
         var appleSignIn = AppleSignInFeature.State()
         var kakaoSignIn = KakaoSignInFeature.State()
         var signUp = SignUpFeature.State()
@@ -31,6 +34,9 @@ struct LoginFeature {
         case appleSignIn(AppleSignInFeature.Action)
         case kakaoSignIn(KakaoSignInFeature.Action)
         case signUp(SignUpFeature.Action)
+        
+        case loginProcessed
+        case loginFailed(String)
     }
     
     @Dependency(\.authManager) var authManager
@@ -47,8 +53,19 @@ struct LoginFeature {
                 return .none
                 
             case .loginButtonTapped:
-                // 여기에 이메일/비밀번호 로그인 로직 구현
-                return .none
+                let email = state.email
+                let password = state.password
+                
+                return .run { send in
+                    print(".loginButtonTapped is working")
+                    let serverLoginResponse = await authManager.loginWithEmail(email: email, password: password)
+                    switch serverLoginResponse {
+                    case.success :
+                        await send(.loginProcessed)
+                    case .failure(let error) :
+                        await send(.loginFailed(error.localizedDescription))
+                    }
+                }
                 
             case .signUpButtonTapped:
                 state.isShowingSignUp = true
@@ -63,11 +80,22 @@ struct LoginFeature {
                 
             case .kakaoSignIn:
                 return .none
+                
             case .signUp :
+                return .none
+                
+            case .loginProcessed:
+                state.isLoading = false
+                return .none
+                
+            case let .loginFailed(message):
+                state.isLoading = false
+                state.errorMessage = message
+                
                 return .none
             }
         }
-
+        
         Scope(state: \.appleSignIn, action: \.appleSignIn) {
             AppleSignInFeature()
         }

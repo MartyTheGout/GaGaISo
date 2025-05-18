@@ -66,7 +66,7 @@ final class AuthenticationManager: ObservableObject {
 
 //MARK: - Sign up with Apple
 extension AuthenticationManager {
-    func loginWithApple(idToken: String, nick: String) async {
+    func loginWithApple(idToken: String, nick: String) async -> Result<Void, Error> {
         let response = await client.request(
             AuthenticationRouter.v1AppleLogin(
                 idToken: idToken,
@@ -78,20 +78,22 @@ extension AuthenticationManager {
         
         switch response {
         case .success(let result):
+            print("❌ Apple Login 성공: \(result)")
             saveTokenToStore(result.accessToken, result.refreshToken)
-            dump(result)
             await setLoginState(true)
+            return .success(())
             
         case .failure(let error):
             print("❌ Apple Login 실패: \(error)")
             await setLoginState(false)
+            return .failure(error)
         }
     }
 }
 
 //MARK: - Sign up with Kakao
 extension AuthenticationManager {
-    func loginWithKakao(oauthToken: String) async {
+    func loginWithKakao(oauthToken: String) async -> Result<Void, Error> {
         let response = await client.request(
             AuthenticationRouter.v1KakaoLogin(
                 oauthToken: oauthToken,
@@ -104,10 +106,12 @@ extension AuthenticationManager {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
             await setLoginState(true)
+            return .success(())
             
         case .failure(let error):
             print("❌ Kakao Login 실패: \(error)")
             await setLoginState(false)
+            return .failure(error)
         }
     }
 }
@@ -117,7 +121,7 @@ extension AuthenticationManager {
     func loginWithEmail(
         email: String,
         password: String
-    ) async {
+    ) async -> Result<Void, Error> {
         let response = await client.request(
             AuthenticationRouter.v1EmailLogin(email: email, password: password, deviceToken: deviceToken ?? "" ).urlRequest,
             responseType: LoginResponse.self
@@ -125,24 +129,28 @@ extension AuthenticationManager {
         
         switch response {
         case .success(let result):
+            print("❌ Email Login 성공: \(result)")
             saveTokenToStore(result.accessToken, result.refreshToken)
             await setLoginState(true)
+            return .success(())
         case .failure(let error):
             print("❌ Email Login 실패: \(error)")
             await setLoginState(false)
+            return .failure(error)
         }
     }
     
-    func register(email: String, password: String, nickname: String) async  {
+    func register(email: String, password: String, nickname: String) async -> Result<Void, Error> {
         let response = await client.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil).urlRequest, responseType: LoginResponse.self)
         
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
             await setLoginState(true)
-            
+            return .success(())
         case .failure(let error):
             print(error)
+            return .failure(error)
         }
     }
 }

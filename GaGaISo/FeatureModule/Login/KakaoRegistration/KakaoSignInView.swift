@@ -7,9 +7,12 @@
 
 import SwiftUI
 import ComposableArchitecture
+import Toasts
 
 struct KakaoSignInView: View {
     let store: StoreOf<KakaoSignInFeature>
+    
+    @Environment(\.presentToast) private var presentToast
     
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
@@ -28,21 +31,16 @@ struct KakaoSignInView: View {
             }
             .disabled(viewStore.isLoading)
             .frame(height: 55)
-            .alert(
-                "로그인 오류",
-                isPresented: .init(
-                    get: { viewStore.errorMessage != nil },
-                    set: { if !$0 { viewStore.send(.loginFailed("")) } }
-                ),
-                actions: {
-                    Button("확인") {}
-                },
-                message: {
-                    if let errorMessage = viewStore.errorMessage {
-                        Text(errorMessage)
-                    }
+            .onChange(of: viewStore.errorMessage) { _, newErrorMessage in
+                if let errorMessage = newErrorMessage {
+                    let toast = ToastValue(
+                        icon: Image(systemName: "exclamationmark.triangle"),
+                        message: errorMessage,
+                        duration: 3.0
+                    )
+                    presentToast(toast)
                 }
-            )
+            }
         }
     }
 }

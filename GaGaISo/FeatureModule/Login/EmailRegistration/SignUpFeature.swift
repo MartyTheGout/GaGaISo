@@ -21,6 +21,7 @@ struct SignUpFeature {
         var confirmPassword = ""
         var nickname = ""
         var isLoading = false
+        var errorMessage: String? = nil
         var focusedField: SignUpField? = nil
         
         var fieldStates: [SignUpField: FieldState] = [
@@ -133,7 +134,7 @@ struct SignUpFeature {
                             case .success:
                                 return true
                             case .failure(let error):
-                                throw error
+                                return false
                             }
                         }
                     ))
@@ -144,8 +145,9 @@ struct SignUpFeature {
                 state.registrationSuccess = success
                 return .none
                 
-            case .registrationResponse(.failure):
+            case .registrationResponse(.failure(let error)):
                 state.isLoading = false
+                state.errorMessage = error.localizedDescription
                 return .none
             }
         }
