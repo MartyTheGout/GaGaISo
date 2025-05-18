@@ -12,6 +12,7 @@
 		407D27302DD342110043F141 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 407D272F2DD342110043F141 /* KakaoSDKAuth */; };
 		407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 407D27312DD342110043F141 /* KakaoSDKCommon */; };
 		40C059842DD75A080012671F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 40C059832DD75A080012671F /* ComposableArchitecture */; };
+		40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */ = {isa = PBXBuildFile; productRef = 40C05A5D2DD9CFD60012671F /* Toasts */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */,
 				407D272E2DD342110043F141 /* KakaoSDK in Frameworks */,
 				407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */,
 				40C059842DD75A080012671F /* ComposableArchitecture in Frameworks */,
@@ -96,6 +98,7 @@
 				407D272F2DD342110043F141 /* KakaoSDKAuth */,
 				407D27312DD342110043F141 /* KakaoSDKCommon */,
 				40C059832DD75A080012671F /* ComposableArchitecture */,
+				40C05A5D2DD9CFD60012671F /* Toasts */,
 			);
 			productName = GaGaISo;
 			productReference = 407D26712DD32AE90043F141 /* GaGaISo.app */;
@@ -128,6 +131,7 @@
 			packageReferences = (
 				407D272C2DD342110043F141 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 				40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				40C05A5C2DD9CFD60012671F /* XCRemoteSwiftPackageReference "swiftui-toasts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 407D26722DD32AE90043F141 /* Products */;
@@ -398,6 +402,14 @@
 				minimumVersion = 1.19.1;
 			};
 		};
+		40C05A5C2DD9CFD60012671F /* XCRemoteSwiftPackageReference "swiftui-toasts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sunghyun-k/swiftui-toasts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -420,6 +432,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
+		};
+		40C05A5D2DD9CFD60012671F /* Toasts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40C05A5C2DD9CFD60012671F /* XCRemoteSwiftPackageReference "swiftui-toasts" */;
+			productName = Toasts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
