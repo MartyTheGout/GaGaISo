@@ -16,15 +16,25 @@ struct NetworkClientKey: DependencyKey {
 }
 
 struct AuthManagerKey: DependencyKey {
-    static let liveValue: AuthenticationManager = {
+    static let liveValue: AuthManagerProtocol = {
         @Dependency(\.authStore) var authStore
         @Dependency(\.networkClient) var networkClient
         return AuthenticationManager(authStore: authStore, networkClient: networkClient)
     }()
+    
+    static var testValue: AuthManagerProtocol {
+        return MockAuthManager()
+    }
 }
 
 struct NotificationManagerKey: DependencyKey {
     static let liveValue = NotificationManager()
+}
+
+enum KakaoUserApiKey: DependencyKey {
+    static let liveValue: KakaoUserApiProtocol = KakaoUserApi()
+    
+    static let testValue: KakaoUserApiProtocol = MockKakaoUserApi()
 }
 
 extension DependencyValues {
@@ -38,7 +48,7 @@ extension DependencyValues {
         set { self[NetworkClientKey.self] = newValue }
     }
     
-    var authManager: AuthenticationManager {
+    var authManager: AuthManagerProtocol {
         get { self[AuthManagerKey.self] }
         set { self[AuthManagerKey.self] = newValue }
     }
@@ -46,5 +56,10 @@ extension DependencyValues {
     var notificationManager: NotificationManager {
         get { self[NotificationManagerKey.self] }
         set { self[NotificationManagerKey.self] = newValue }
+    }
+    
+    var kakaoUserApi: KakaoUserApiProtocol {
+        get { self[KakaoUserApiKey.self] }
+        set { self[KakaoUserApiKey.self] = newValue }
     }
 }

@@ -26,6 +26,7 @@ struct KakaoSignInFeature {
     }
     
     @Dependency(\.authManager) var authManager
+    @Dependency(\.kakaoUserApi) var kakaoUserApi
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -36,9 +37,9 @@ struct KakaoSignInFeature {
                 
                 return .run { send in
                     do {
-                        if UserApi.isKakaoTalkLoginAvailable() {
+                        if kakaoUserApi.isKakaoTalkLoginAvailable() {
                             let accessToken: String = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
-                                UserApi.shared.loginWithKakaoTalk { oauthToken, error in
+                                kakaoUserApi.loginWithKakaoTalk { oauthToken, error in
                                     if let error = error {
                                         continuation.resume(throwing: error)
                                     } else if let accessToken = oauthToken?.accessToken {
@@ -52,7 +53,7 @@ struct KakaoSignInFeature {
                             await send(.kakaoLoginSuccess(accessToken))
                         } else {
                             let accessToken: String = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
-                                UserApi.shared.loginWithKakaoAccount { oauthToken, error in
+                                kakaoUserApi.loginWithKakaoAccount { oauthToken, error in
                                     if let error = error {
                                         continuation.resume(throwing: error)
                                     } else if let accessToken = oauthToken?.accessToken {

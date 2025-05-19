@@ -15,9 +15,20 @@
 		40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */ = {isa = PBXBuildFile; productRef = 40C05A5D2DD9CFD60012671F /* Toasts */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		408138462DDB11F5001F3C10 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 407D26692DD32AE90043F141 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 407D26702DD32AE90043F141;
+			remoteInfo = GaGaISo;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		407D26712DD32AE90043F141 /* GaGaISo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GaGaISo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		407D26822DD32B100043F141 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		408138422DDB11F5001F3C10 /* GaGaISoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GaGaISoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -28,6 +39,22 @@
 			);
 			target = 407D26702DD32AE90043F141 /* GaGaISo */;
 		};
+		4081384E2DDB1327001F3C10 /* Exceptions for "GaGaISoTests" folder in "GaGaISo" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Mocks/MockAuthManager.swift,
+				Mocks/MockKakaoAPI.swift,
+			);
+			target = 407D26702DD32AE90043F141 /* GaGaISo */;
+		};
+		4081384F2DDB1327001F3C10 /* Exceptions for "GaGaISoTests" folder in "GaGaISoTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Mocks/MockAuthManager.swift,
+				Mocks/MockKakaoAPI.swift,
+			);
+			target = 408138412DDB11F5001F3C10 /* GaGaISoTests */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -37,6 +64,15 @@
 				407D27732DD359ED0043F141 /* Exceptions for "GaGaISo" folder in "GaGaISo" target */,
 			);
 			path = GaGaISo;
+			sourceTree = "<group>";
+		};
+		408138432DDB11F5001F3C10 /* GaGaISoTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4081384E2DDB1327001F3C10 /* Exceptions for "GaGaISoTests" folder in "GaGaISo" target */,
+				4081384F2DDB1327001F3C10 /* Exceptions for "GaGaISoTests" folder in "GaGaISoTests" target */,
+			);
+			path = GaGaISoTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -54,6 +90,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4081383F2DDB11F5001F3C10 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -62,6 +105,8 @@
 			children = (
 				407D26822DD32B100043F141 /* .gitignore */,
 				407D26732DD32AE90043F141 /* GaGaISo */,
+				408138432DDB11F5001F3C10 /* GaGaISoTests */,
+				40C05BC32DDAF8250012671F /* Frameworks */,
 				407D26722DD32AE90043F141 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -70,8 +115,16 @@
 			isa = PBXGroup;
 			children = (
 				407D26712DD32AE90043F141 /* GaGaISo.app */,
+				408138422DDB11F5001F3C10 /* GaGaISoTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		40C05BC32DDAF8250012671F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -104,6 +157,30 @@
 			productReference = 407D26712DD32AE90043F141 /* GaGaISo.app */;
 			productType = "com.apple.product-type.application";
 		};
+		408138412DDB11F5001F3C10 /* GaGaISoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 408138482DDB11F5001F3C10 /* Build configuration list for PBXNativeTarget "GaGaISoTests" */;
+			buildPhases = (
+				4081383E2DDB11F5001F3C10 /* Sources */,
+				4081383F2DDB11F5001F3C10 /* Frameworks */,
+				408138402DDB11F5001F3C10 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				408138552DDB146A001F3C10 /* PBXTargetDependency */,
+				408138472DDB11F5001F3C10 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				408138432DDB11F5001F3C10 /* GaGaISoTests */,
+			);
+			name = GaGaISoTests;
+			packageProductDependencies = (
+			);
+			productName = GaGaISoTests;
+			productReference = 408138422DDB11F5001F3C10 /* GaGaISoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -116,6 +193,10 @@
 				TargetAttributes = {
 					407D26702DD32AE90043F141 = {
 						CreatedOnToolsVersion = 16.0;
+					};
+					408138412DDB11F5001F3C10 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = 407D26702DD32AE90043F141;
 					};
 				};
 			};
@@ -139,6 +220,7 @@
 			projectRoot = "";
 			targets = (
 				407D26702DD32AE90043F141 /* GaGaISo */,
+				408138412DDB11F5001F3C10 /* GaGaISoTests */,
 			);
 		};
 /* End PBXProject section */
@@ -152,6 +234,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		408138402DDB11F5001F3C10 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -162,7 +251,26 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4081383E2DDB11F5001F3C10 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		408138472DDB11F5001F3C10 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 407D26702DD32AE90043F141 /* GaGaISo */;
+			targetProxy = 408138462DDB11F5001F3C10 /* PBXContainerItemProxy */;
+		};
+		408138552DDB146A001F3C10 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 408138542DDB146A001F3C10 /* ComposableArchitecture */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		407D267D2DD32AEA0043F141 /* Debug */ = {
@@ -362,6 +470,42 @@
 			};
 			name = Release;
 		};
+		408138492DDB11F5001F3C10 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BU56QU36XP;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.marty.GaGaISoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GaGaISo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GaGaISo";
+			};
+			name = Debug;
+		};
+		4081384A2DDB11F5001F3C10 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BU56QU36XP;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.marty.GaGaISoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GaGaISo.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GaGaISo";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -379,6 +523,15 @@
 			buildConfigurations = (
 				407D26802DD32AEA0043F141 /* Debug */,
 				407D26812DD32AEA0043F141 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		408138482DDB11F5001F3C10 /* Build configuration list for PBXNativeTarget "GaGaISoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				408138492DDB11F5001F3C10 /* Debug */,
+				4081384A2DDB11F5001F3C10 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -427,6 +580,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 407D272C2DD342110043F141 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKCommon;
+		};
+		408138542DDB146A001F3C10 /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
 		};
 		40C059832DD75A080012671F /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;

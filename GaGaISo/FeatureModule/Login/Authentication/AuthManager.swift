@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class AuthenticationManager: ObservableObject {
+final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
     @Published var isLoggedIn: Bool = false
     
     private let client: RawNetworkClient

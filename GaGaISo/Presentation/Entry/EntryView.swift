@@ -20,7 +20,7 @@ struct AppEntryView: View {
             self.store = store
         
             let manager = AuthManagerKey.liveValue
-            self._authManager = ObservedObject(wrappedValue: manager)
+            self._authManager = ObservedObject(wrappedValue: manager as! AuthenticationManager)
         }
     
     var body: some View {
