@@ -11,8 +11,6 @@ import ComposableArchitecture
 struct AppEntryView: View {
     let store: StoreOf<AppFeature>
     
-
-    
     @Dependency(\.authManager) private var authManagerDependency
         @ObservedObject private var authManager: AuthenticationManager
         
