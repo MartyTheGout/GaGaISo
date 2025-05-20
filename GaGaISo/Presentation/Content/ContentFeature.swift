@@ -10,18 +10,23 @@ import ComposableArchitecture
 
 @Reducer
 struct ContentFeature {
+    enum Tab: Equatable {
+           case home
+           case orders
+           case favorites
+           case profile
+       }
+        
     struct State: Equatable {
         var selectedTab: Tab = .home
-        var home: HomeFeature.State = .init()
-        var orders: OrdersFeature.State = .init()
-        var favorites: FavoritesFeature.State = .init()
-        var profile: ProfileFeature.State = .init()
-        var isMiddleButtonActive: Bool = false
+        var home  = HomeFeature.State()
+        var orders = OrdersFeature.State()
+        var favorites = FavoritesFeature.State()
+        var profile = ProfileFeature.State()
     }
     
     enum Action: Equatable {
         case tabSelected(Tab)
-        case middleButtonTapped
         case home(HomeFeature.Action)
         case orders(OrdersFeature.Action)
         case favorites(FavoritesFeature.Action)
@@ -35,28 +40,24 @@ struct ContentFeature {
                 state.selectedTab = tab
                 return .none
                 
-            case .middleButtonTapped:
-                state.isMiddleButtonActive.toggle()
-                return .none
-                
             case .home, .orders, .favorites, .profile:
                 return .none
             }
         }
         
-        Scope(state: \.home, action: /Action.home) {
+        Scope(state: \.home, action: \.home) {
             HomeFeature()
         }
         
-        Scope(state: \.orders, action: /Action.orders) {
+        Scope(state: \.orders, action: \.orders) {
             OrdersFeature()
         }
         
-        Scope(state: \.favorites, action: /Action.favorites) {
+        Scope(state: \.favorites, action: \.favorites) {
             FavoritesFeature()
         }
         
-        Scope(state: \.profile, action: /Action.profile) {
+        Scope(state: \.profile, action: \.profile) {
             ProfileFeature()
         }
     }
