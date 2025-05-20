@@ -18,9 +18,13 @@ struct HomeView: View {
                     .font(.largeTitle)
                     .padding()
                 
-                // Food categories and listings would go here
-                // Similar to the first screenshot
+                LocationRevealingView(store: store.scope(state: \.locationState, action: \.locationAction))
+                
             }
+            .padding()
+            .background(Color.gray.opacity(0.1))
+            .cornerRadius(8)
+            .padding(.horizontal)
         }
     }
 }

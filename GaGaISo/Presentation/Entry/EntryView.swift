@@ -12,14 +12,14 @@ struct AppEntryView: View {
     let store: StoreOf<AppFeature>
     
     @Dependency(\.authManager) private var authManagerDependency
-        @ObservedObject private var authManager: AuthenticationManager
+    @ObservedObject private var authManager: AuthenticationManager
+    
+    init(store: StoreOf<AppFeature>) {
+        self.store = store
         
-        init(store: StoreOf<AppFeature>) {
-            self.store = store
-        
-            let manager = AuthManagerKey.liveValue
-            self._authManager = ObservedObject(wrappedValue: manager as! AuthenticationManager)
-        }
+        let manager = AuthManagerKey.liveValue
+        self._authManager = ObservedObject(wrappedValue: manager as! AuthenticationManager)
+    }
     
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in

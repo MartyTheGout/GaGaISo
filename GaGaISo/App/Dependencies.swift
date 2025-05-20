@@ -31,6 +31,10 @@ struct NotificationManagerKey: DependencyKey {
     static let liveValue = NotificationManager()
 }
 
+struct LocationManagerKey: DependencyKey {
+    static let liveValue = LocationManager()
+}
+
 enum KakaoUserApiKey: DependencyKey {
     static let liveValue: KakaoUserApiProtocol = KakaoUserApi()
     
@@ -62,4 +66,10 @@ extension DependencyValues {
         get { self[KakaoUserApiKey.self] }
         set { self[KakaoUserApiKey.self] = newValue }
     }
+    
+    var locationManager: LocationManager {
+        get { self[LocationManagerKey.self] }
+        set { self[LocationManagerKey.self] = newValue }
+    }
 }
+
