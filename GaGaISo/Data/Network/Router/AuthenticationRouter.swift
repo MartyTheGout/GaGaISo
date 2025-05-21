@@ -100,7 +100,7 @@ enum AuthenticationRouter: RouterProtocol {
         }
     }
     
-    var headers: [String: String] {
+    var baseHeaders: [String: String] {
         switch self {
         case .v1AuthRefresh(let accessToken, let refreshToken):
             return [
@@ -116,27 +116,5 @@ enum AuthenticationRouter: RouterProtocol {
                 "SeSACKey": APIKey.PICKUP
             ]
         }
-    }
-    
-    var urlRequest: URLRequest {
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
-        components?.queryItems = parameter.isEmpty ? nil : parameter
-        
-        guard let url = components?.url else {
-            fatalError("[Error: Router] Failed on generating URL")
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = method
-        
-        if let body = body {
-            request.httpBody = body
-        }
-        
-        for (key, value) in headers {
-            request.setValue(value, forHTTPHeaderField: key)
-        }
-        
-        return request
     }
 }

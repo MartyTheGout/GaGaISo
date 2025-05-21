@@ -31,7 +31,7 @@ final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
               let refreshToken = authStore.refreshToken else {
             return false
         }
-        let request = AuthenticationRouter.v1AuthRefresh(accessToken: accessToken, refreshToken: refreshToken).urlRequest
+        let request = AuthenticationRouter.v1AuthRefresh(accessToken: accessToken, refreshToken: refreshToken).createRequest(withToken: accessToken)
         let result: Result<TokenRefresheResponse, APIError> = await client.request(request, responseType: TokenRefresheResponse.self)
         
         switch result {
@@ -62,6 +62,10 @@ final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
             self.isLoggedIn = value
         }
     }
+    
+    func getAccessToken() -> String? {
+        return authStore.accessToken
+    }
 }
 
 //MARK: - Sign up with Apple
@@ -72,7 +76,7 @@ extension AuthenticationManager {
                 idToken: idToken,
                 deviceToken: deviceToken ?? "",
                 nick: nick
-            ).urlRequest,
+            ).createRequest(withToken: nil),
             responseType: LoginResponse.self
         )
         
@@ -98,7 +102,7 @@ extension AuthenticationManager {
             AuthenticationRouter.v1KakaoLogin(
                 oauthToken: oauthToken,
                 deviceToken: deviceToken ?? ""
-            ).urlRequest,
+            ).createRequest(withToken: nil),
             responseType: LoginResponse.self
         )
         
@@ -123,7 +127,7 @@ extension AuthenticationManager {
         password: String
     ) async -> Result<Void, Error> {
         let response = await client.request(
-            AuthenticationRouter.v1EmailLogin(email: email, password: password, deviceToken: deviceToken ?? "" ).urlRequest,
+            AuthenticationRouter.v1EmailLogin(email: email, password: password, deviceToken: deviceToken ?? "" ).createRequest(withToken: nil),
             responseType: LoginResponse.self
         )
         
@@ -141,7 +145,7 @@ extension AuthenticationManager {
     }
     
     func register(email: String, password: String, nickname: String) async -> Result<Void, Error> {
-        let response = await client.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil).urlRequest, responseType: LoginResponse.self)
+        let response = await client.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil).createRequest(withToken: nil), responseType: LoginResponse.self)
         
         switch response {
         case .success(let result):

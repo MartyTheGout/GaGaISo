@@ -46,11 +46,11 @@ final class StrategicNetworkHandler {
     }
 
     func request<T: Decodable>(_ route: RouterProtocol, type: T.Type) async -> Result<T, APIError> {
-        let request = route.urlRequest
+        let request = route.createRequest(withToken: authManager.getAccessToken())
         
         let result: Result<T, APIError> = await client.request(request, responseType: T.self)
 
-        if case .failure(let error) = result, case .invalidResponse(let code, _, _) = error, [401, 403].contains(code) {
+        if case .failure(let error) = result, case .invalidResponse(let code, _, _) = error, [419].contains(code) {
             let refreshed = await authManager.tryRefreshIfNeeded()
             if refreshed {
                 return await client.request(request, responseType: type) // retry
