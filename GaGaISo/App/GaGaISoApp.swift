@@ -16,7 +16,7 @@ struct GaGaISoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     //testMode
-    var forceLoginProcess = true
+    var forceLoginProcess = false
     
     init() {
         @Dependency(\.authStore) var authStore

@@ -32,7 +32,7 @@ final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
             return false
         }
         let request = AuthenticationRouter.v1AuthRefresh(accessToken: accessToken, refreshToken: refreshToken).createRequest(withToken: accessToken)
-        let result: Result<TokenRefresheResponse, APIError> = await client.request(request, responseType: TokenRefresheResponse.self)
+        let result: Result<TokenRefresheResponseDTO, APIError> = await client.request(request, responseType: TokenRefresheResponseDTO.self)
         
         switch result {
             
@@ -77,7 +77,7 @@ extension AuthenticationManager {
                 deviceToken: deviceToken ?? "",
                 nick: nick
             ).createRequest(withToken: nil),
-            responseType: LoginResponse.self
+            responseType: LoginResponseDTO.self
         )
         
         switch response {
@@ -103,7 +103,7 @@ extension AuthenticationManager {
                 oauthToken: oauthToken,
                 deviceToken: deviceToken ?? ""
             ).createRequest(withToken: nil),
-            responseType: LoginResponse.self
+            responseType: LoginResponseDTO.self
         )
         
         switch response {
@@ -128,7 +128,7 @@ extension AuthenticationManager {
     ) async -> Result<Void, Error> {
         let response = await client.request(
             AuthenticationRouter.v1EmailLogin(email: email, password: password, deviceToken: deviceToken ?? "" ).createRequest(withToken: nil),
-            responseType: LoginResponse.self
+            responseType: LoginResponseDTO.self
         )
         
         switch response {
@@ -145,7 +145,7 @@ extension AuthenticationManager {
     }
     
     func register(email: String, password: String, nickname: String) async -> Result<Void, Error> {
-        let response = await client.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil).createRequest(withToken: nil), responseType: LoginResponse.self)
+        let response = await client.request(AuthenticationRouter.v1EmailJoin(email: email, password: password, nick: nickname, phoneNum: nil, deviceToken: nil).createRequest(withToken: nil), responseType: LoginResponseDTO.self)
         
         switch response {
         case .success(let result):

@@ -126,8 +126,8 @@ struct SignUpFeature {
                                     nick: nickname,
                                     phoneNum: nil,
                                     deviceToken: nil
-                                ).urlRequest,
-                                responseType: LoginResponse.self
+                                ).createRequest(withToken: nil),
+                                responseType: LoginResponseDTO.self
                             )
                             
                             switch response {
