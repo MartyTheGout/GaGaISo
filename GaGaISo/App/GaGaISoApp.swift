@@ -14,13 +14,13 @@ import Toasts
 @main
 struct GaGaISoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    let diContainer = DIContainer()
     
     //testMode
-    var forceLoginProcess = false
+    var forceLoginProcess = true
     
     init() {
-        @Dependency(\.authStore) var authStore
-        
+        let authStore = diContainer.authStore
         appDelegate.authStore = authStore
         
         if authStore.deviceToken == nil {
@@ -40,17 +40,15 @@ struct GaGaISoApp: App {
     
     var body: some Scene {
         WindowGroup {
-            AppEntryView(
-                store: Store(initialState: AppFeature.State()) {
-                    AppFeature()
-                }
-            )
-            .onOpenURL(perform: { url in
-                if AuthApi.isKakaoTalkLoginUrl(url) {
-                    _ = AuthController.handleOpenUrl(url: url)
-                }
-            })
-            .installToast(position: .bottom)
+            AppEntryView(viewModel: diContainer.getEntryViewModel())
+                .environmentObject(diContainer)
+                .environment(\.diContainer, diContainer)
+                .onOpenURL(perform: { url in
+                    if AuthApi.isKakaoTalkLoginUrl(url) {
+                        _ = AuthController.handleOpenUrl(url: url)
+                    }
+                })
+                .installToast(position: .bottom)
         }
     }
 }

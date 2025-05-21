@@ -6,15 +6,15 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
+
 
 struct FavoritesView: View {
-    let store: StoreOf<FavoritesFeature>
+    
     
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
+        
             Text("Favorites")
                 .font(.largeTitle)
-        }
+        
     }
 }

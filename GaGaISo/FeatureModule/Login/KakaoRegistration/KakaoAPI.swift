@@ -15,7 +15,6 @@ struct KakaoUserApi: KakaoUserApiProtocol {
     
     func loginWithKakaoTalk(completion: @escaping (OAuthToken?, Error?) -> Void) {
         UserApi.shared.loginWithKakaoTalk { oauthToken, error in
-            // KakaoSDK의 OAuthToken을 우리의 OAuthToken으로 변환
             let token = oauthToken.map { OAuthToken(accessToken: $0.accessToken) }
             completion(token, error)
         }

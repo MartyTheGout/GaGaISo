@@ -6,25 +6,33 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 
 struct HomeView: View {
-    let store: StoreOf<HomeFeature>
+    @Environment(\.diContainer) private var diContainer
+    @StateObject private var viewModel: HomeViewModel
+    
+    init(viewModel: HomeViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            VStack {
-                Text("Home")
-                    .font(.largeTitle)
-                    .padding()
-                
-                LocationRevealingView(store: store.scope(state: \.locationState, action: \.locationAction))
-                
-            }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(8)
-            .padding(.horizontal)
+        VStack {
+            Text("Home")
+                .font(.largeTitle)
+                .padding()
+            
+            LocationRevealingView(viewModel: diContainer.getLocationViewModel())
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(8)
+        .padding(.horizontal)
+        .onAppear {
+
+            viewModel.onAppear()
+        }
+        .onDisappear {
+            viewModel.onDisappear()
         }
     }
 }

@@ -7,44 +7,46 @@
 
 import SwiftUI
 import AuthenticationServices
-import ComposableArchitecture
 import Toasts
 
 struct AppleSignInView: View {
     @Environment(\.presentToast) private var presentToast
     
-    let store: StoreOf<AppleSignInFeature>
+    @StateObject private var viewModel: AppleSignInViewModel
+    
+    init(viewModel: AppleSignInViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            SignInWithAppleButton(.signIn) { request in
-                request.requestedScopes = [.fullName, .email]
-            } onCompletion: { result in
-                switch result {
-                case .success(let authorization):
-                    viewStore.send(.authorizationSuccess(authorization))
-                case .failure(let error):
-                    viewStore.send(.authorizationFailure(error.localizedDescription))
-                }
+        SignInWithAppleButton(.signIn) { request in
+            request.requestedScopes = [.fullName, .email]
+        } onCompletion: { result in
+            switch result {
+            case .success(let authorization):
+                viewModel.handleAuthorization(authorization)
+            case .failure(let error):
+                viewModel.handleAuthorizationFailure(error)
             }
-            .frame(height: 50)
-            .disabled(viewStore.isLoading)
-            .overlay {
-                if viewStore.isLoading {
-                    ProgressView()
-                }
+        }
+        .frame(height: 50)
+        .disabled(viewModel.isLoading)
+        .overlay {
+            if viewModel.isLoading {
+                ProgressView()
             }
-            .onChange(of: viewStore.errorMessage) { _, newErrorMessage in
-                if let errorMessage = newErrorMessage {
-                    let toast = ToastValue (
-                        icon: Image(systemName: "exclamationmark.triangle"),
-                        message: errorMessage,
-                        duration: 3.0
-                    )
-                    presentToast(toast)
-                }
-                
+        }
+        .onChange(of: viewModel.errorMessage) { _, newErrorMessage in
+            if let errorMessage = newErrorMessage {
+                let toast = ToastValue (
+                    icon: Image(systemName: "exclamationmark.triangle"),
+                    message: errorMessage,
+                    duration: 3.0
+                )
+                presentToast(toast)
             }
+            
+            
         }
     }
 }

@@ -6,41 +6,42 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 import Toasts
 
 struct KakaoSignInView: View {
-    let store: StoreOf<KakaoSignInFeature>
-    
     @Environment(\.presentToast) private var presentToast
+    @StateObject private var viewModel: KakaoSignInViewModel
+    
+    init(viewModel: KakaoSignInViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            Button {
-                viewStore.send(.kakaoLoginTapped)
-            } label: {
-                Image("kakao_login_button")
-                    .resizable()
-                    .overlay {
-                        if viewStore.isLoading {
-                            Color.black.opacity(0.2)
-                            ProgressView()
-                                .tint(.black)
-                        }
+        Button {
+            viewModel.kakaoLoginTapped()
+        } label: {
+            Image("kakao_login_button")
+                .resizable()
+                .overlay {
+                    if viewModel.isLoading {
+                        Color.black.opacity(0.2)
+                        ProgressView()
+                            .tint(.black)
                     }
-            }
-            .disabled(viewStore.isLoading)
-            .frame(height: 55)
-            .onChange(of: viewStore.errorMessage) { _, newErrorMessage in
-                if let errorMessage = newErrorMessage {
-                    let toast = ToastValue(
-                        icon: Image(systemName: "exclamationmark.triangle"),
-                        message: errorMessage,
-                        duration: 3.0
-                    )
-                    presentToast(toast)
                 }
+        }
+        .disabled(viewModel.isLoading)
+        .frame(height: 55)
+        .onChange(of: viewModel.errorMessage) { _, newErrorMessage in
+            if let errorMessage = newErrorMessage {
+                let toast = ToastValue(
+                    icon: Image(systemName: "exclamationmark.triangle"),
+                    message: errorMessage,
+                    duration: 3.0
+                )
+                presentToast(toast)
             }
         }
+        
     }
 }

@@ -6,15 +6,12 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
 
 struct ProfileView: View {
-    let store: StoreOf<ProfileFeature>
-    
     var body: some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            Text("Profile")
-                .font(.largeTitle)
-        }
+        
+        Text("Profile")
+            .font(.largeTitle)
+        
     }
 }

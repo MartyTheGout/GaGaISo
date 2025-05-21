@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct FavoriteStoresSection: View {
     @Binding var currentTab: Int
     

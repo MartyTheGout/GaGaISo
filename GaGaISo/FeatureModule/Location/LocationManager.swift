@@ -27,10 +27,10 @@ enum LocationState: Equatable {
     }
 }
 
-@Observable class LocationManager: NSObject, CLLocationManagerDelegate {
+class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     private var locationManager = CLLocationManager()
     
-    var location: CLLocation?
+    @Published var location: CLLocation?
     
     var latitude: Double {
         location?.coordinate.latitude ?? 0.0
@@ -40,14 +40,9 @@ enum LocationState: Equatable {
         location?.coordinate.longitude ?? 0.0
     }
     
-    var koreanAddress: String = "주소를 찾는 중..."
-    var locationState: LocationState = .idle
-    
-    var authorizationStatus: CLAuthorizationStatus {
-        didSet {
-            NotificationCenter.default.post(name: .authorizationStatusChanged, object: self, userInfo: ["isGranted": isLocationPermissionGranted])
-        }
-    }
+    @Published var koreanAddress: String = "주소를 찾는 중..."
+    @Published var locationState: LocationState = .idle
+    @Published var authorizationStatus: CLAuthorizationStatus
     
     var isLocationPermissionGranted: Bool {
         authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways
@@ -64,7 +59,6 @@ enum LocationState: Equatable {
     func startUpdatingLocation() {
         if isLocationPermissionGranted {
             locationState = .loading
-            NotificationCenter.default.post(name: .locationDidUpdate, object: self)
             locationManager.startUpdatingLocation()
         } else {
             requestLocationPermission()
@@ -77,7 +71,6 @@ enum LocationState: Equatable {
     
     func requestLocationPermission() {
         if isLocationPermissionGranted {
-            
             startUpdatingLocation()
             return
         }
@@ -109,13 +102,11 @@ enum LocationState: Equatable {
             if let error = error {
                 self.locationState = .error(error)
                 self.koreanAddress = "주소를 찾을 수 없습니다."
-                NotificationCenter.default.post(name: .locationDidUpdate, object: self)
                 return
             }
             
             guard let placemark = placemarks?.first else {
                 self.koreanAddress = "주소를 찾을 수 없습니다."
-                NotificationCenter.default.post(name: .locationDidUpdate, object: self)
                 return
             }
             
@@ -132,11 +123,9 @@ enum LocationState: Equatable {
             if !address.isEmpty {
                 self.koreanAddress = address
                 self.locationState = .success
-                NotificationCenter.default.post(name: .locationDidUpdate, object: self)
             } else {
                 self.koreanAddress = "상세 주소를 찾을 수 없습니다."
                 self.locationState = .error(NSError(domain: "LocationManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "주소 정보 없음"]))
-                NotificationCenter.default.post(name: .locationDidUpdate, object: self)
             }
         }
     }
@@ -151,7 +140,6 @@ enum LocationState: Equatable {
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         locationState = .error(error)
         koreanAddress = "위치를 가져오는 데 실패했습니다."
-        NotificationCenter.default.post(name: .locationDidUpdate, object: self)
     }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
@@ -167,17 +155,11 @@ enum LocationState: Equatable {
         case .denied, .restricted:
             locationState = .error(NSError(domain: "LocationManager", code: 2, userInfo: [NSLocalizedDescriptionKey: "위치 권한이 없습니다."]))
             koreanAddress = "위치 권한이 없습니다."
-            NotificationCenter.default.post(name: .locationDidUpdate, object: self)
         case .notDetermined:
             locationState = .idle
-            NotificationCenter.default.post(name: .locationDidUpdate, object: self)
         @unknown default:
             break
         }
     }
 }
 
-extension Notification.Name {
-    static let locationDidUpdate = Notification.Name("locationDidUpdate")
-    static let authorizationStatusChanged = Notification.Name("authorizationStatusChanged")
-}
