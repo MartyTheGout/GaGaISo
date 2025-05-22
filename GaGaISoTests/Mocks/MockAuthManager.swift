@@ -93,4 +93,7 @@ final class MockAuthManager: AuthManagerProtocol {
         
         return registerResult
     }
+    func getAccessToken() -> String? {
+        return savedAccessToken
+    }
 }

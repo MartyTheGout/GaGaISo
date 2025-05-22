@@ -16,23 +16,44 @@ struct HomeView: View {
     }
     
     var body: some View {
-        VStack {
-            Text("Home")
-                .font(.largeTitle)
-                .padding()
+        ScrollView {
+            VStack {
+                LocationRevealingView(viewModel: diContainer.getLocationViewModel())
+                    .padding(.vertical)
+                
+                SearchBarView()
+                
+                PopularKeywordView(viewModel: diContainer.getPopularKeywordViewModel())
+                
+                VStack {
+                    PopularStoreView(viewModel: diContainer.getPoupularStoreViewModel())
+                    
+                    FavoriteStoresSection(currentTab: $viewModel.currentTab)
+                        .padding(.vertical)
+                    
+                    if let store = viewModel.stores {
+                        StoreListView(store: store)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .background(.gray0)
+                .cornerRadius(25, corners: [.topLeft, .topRight])
+            }
             
-            LocationRevealingView(viewModel: diContainer.getLocationViewModel())
+            .onAppear {
+                Task {
+                    await viewModel.onAppear()
+                }
+            }
+            .onDisappear {
+                viewModel.onDisappear()
+            }
         }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(8)
-        .padding(.horizontal)
-        .onAppear {
-
-            viewModel.onAppear()
-        }
-        .onDisappear {
-            viewModel.onDisappear()
-        }
+        .background(Color.brightSprout.ignoresSafeArea())
     }
+}
+
+#Preview {
+    let diContainer = DIContainer()
+    HomeView(viewModel: diContainer.getHomeViewModel())
 }

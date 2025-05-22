@@ -21,4 +21,6 @@ protocol AuthManagerProtocol {
 
     func loginWithEmail(email: String, password: String) async -> Result<Void, Error>
     func register(email: String, password: String, nickname: String) async -> Result<Void, Error>
+    
+    func getAccessToken() -> String?
 }

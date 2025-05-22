@@ -14,6 +14,8 @@ class DIContainer: ObservableObject {
     let notificationManager: NotificationManager
     let locationManager: LocationManager
     let kakaoUserApi: KakaoUserApiProtocol
+    let networkManager: StrategicNetworkHandler
+    let storeManager: StoreManager
     
     init(
         authStore: AuthStore = AuthStore(),
@@ -32,6 +34,9 @@ class DIContainer: ObservableObject {
             authStore: authStore,
             networkClient: networkClient
         )
+        
+        self.networkManager = StrategicNetworkHandler(client: networkClient, authManager: authManager)
+        self.storeManager = StoreManager(networkManager: networkManager)
     }
     
     func getEntryViewModel() -> AppEntryViewModel {
@@ -58,10 +63,18 @@ class DIContainer: ObservableObject {
     }
     
     func getHomeViewModel() -> HomeViewModel {
-        HomeViewModel(locationManager: locationManager)
+        HomeViewModel(locationManager: locationManager, networkHandler: networkManager)
     }
     
     func getLocationViewModel() -> LocationRevealingViewModel {
         LocationRevealingViewModel(locationManager: locationManager)
+    }
+    
+    func getPopularKeywordViewModel() -> PopularKeywordViewModel {
+        PopularKeywordViewModel(storeManager: storeManager)
+    }
+    
+    func getPoupularStoreViewModel() -> PopularStoreViewModel {
+        PopularStoreViewModel(storeManager: storeManager)
     }
 }
