@@ -10,8 +10,8 @@ import Combine
 import CoreLocation
 
 class LocationRevealingViewModel: ObservableObject {
+    @Published var displayLocation: String = "위치를 가져오는 중..."
     @Published var currentLocation: CLLocation?
-    @Published var address: String = "주소를 찾는 중..."
     @Published var locationState: LocationState = .idle
     @Published var isLocationPermissionGranted: Bool = false
     
@@ -28,6 +28,7 @@ class LocationRevealingViewModel: ObservableObject {
     
     private func setupObservers() {
         locationManager.$location
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] location in
                 self?.currentLocation = location
             }
@@ -35,18 +36,21 @@ class LocationRevealingViewModel: ObservableObject {
         
 
         locationManager.$koreanAddress
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] address in
-                self?.address = address
+                self?.displayLocation = address
             }
             .store(in: &cancellables)
         
         locationManager.$locationState
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
                 self?.locationState = state
             }
             .store(in: &cancellables)
         
         locationManager.$authorizationStatus
+            .receive(on: DispatchQueue.main)
             .map { $0 == .authorizedWhenInUse || $0 == .authorizedAlways }
             .sink { [weak self] isGranted in
                 self?.isLocationPermissionGranted = isGranted
@@ -60,21 +64,12 @@ class LocationRevealingViewModel: ObservableObject {
     
     private func synchronizeState() {
         self.currentLocation = locationManager.location
-        self.address = locationManager.koreanAddress
+        self.displayLocation = locationManager.koreanAddress
         self.locationState = locationManager.locationState
         self.isLocationPermissionGranted = locationManager.isLocationPermissionGranted
     }
     
     // MARK: - Public Methods
-    
-    func onAppear() {
-        startLocationUpdates()
-    }
-    
-    func onDisappear() {
-        stopLocationUpdates()
-    }
-    
     func requestLocationPermission() {
         locationManager.requestLocationPermission()
     }

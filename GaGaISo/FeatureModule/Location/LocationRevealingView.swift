@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CoreLocation
 
 struct LocationRevealingView: View {
     @StateObject private var viewModel: LocationRevealingViewModel
@@ -16,59 +15,22 @@ struct LocationRevealingView: View {
     }
     
     var body: some View {
-        VStack {
-            VStack(alignment: .leading) {
-                Text("현재 위치")
-                    .font(.headline)
-                
-                switch viewModel.locationState {
-                case .idle:
-                    Text("위치 정보 준비 중...")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    
-                case .loading:
-                    HStack {
-                        ProgressView()
-                            .padding(.trailing, 8)
-                        Text("위치 정보를 가져오는 중...")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                    
-                case .success:
-                    Text(viewModel.address)
-                        .font(.body)
-                    
-                    if let location = viewModel.currentLocation {
-                        Text("좌표: \(location.coordinate.latitude), \(location.coordinate.longitude)")
-                            .font(.caption)
-                            .foregroundColor(.gray)
-                    }
-                    
-                case .error(let error):
-                    Text("오류: \(error.localizedDescription)")
-                        .font(.subheadline)
-                        .foregroundColor(.red)
-                    
-                    Button("다시 시도") {
-                        viewModel.startLocationUpdates()
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
-            .padding()
-            .background(Color.gray.opacity(0.1))
-            .cornerRadius(8)
-            .padding(.horizontal)
+        HStack {
+            Image(systemName: "location.fill")
+                .font(.system(size: 16))
             
+            Text(viewModel.displayLocation)
+                .pretendardFont(size: .body1, weight: .bold)
+        
             Spacer()
         }
+        .foregroundStyle(.gray90)
+        .padding(.horizontal)
         .onAppear {
-            viewModel.onAppear()
+            viewModel.startLocationUpdates()
         }
         .onDisappear {
-            viewModel.onDisappear()
+            viewModel.stopLocationUpdates()
         }
     }
 }

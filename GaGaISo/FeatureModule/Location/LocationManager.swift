@@ -28,7 +28,7 @@ enum LocationState: Equatable {
 }
 
 class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
-    private var locationManager = CLLocationManager()
+    private var clLocationManager = CLLocationManager()
     
     @Published var location: CLLocation?
     
@@ -59,14 +59,14 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     func startUpdatingLocation() {
         if isLocationPermissionGranted {
             locationState = .loading
-            locationManager.startUpdatingLocation()
+            clLocationManager.startUpdatingLocation()
         } else {
             requestLocationPermission()
         }
     }
     
     func stopUpdatingLocation() {
-        locationManager.stopUpdatingLocation()
+        clLocationManager.stopUpdatingLocation()
     }
     
     func requestLocationPermission() {
@@ -75,18 +75,18 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
             return
         }
         
-        locationManager.requestWhenInUseAuthorization()
+        clLocationManager.requestWhenInUseAuthorization()
     }
     
     private func setupLocationManager() {
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.distanceFilter = 10
+        clLocationManager.delegate = self
+        clLocationManager.desiredAccuracy = kCLLocationAccuracyBest
+        clLocationManager.distanceFilter = 10
         
         if isLocationPermissionGranted {
             startUpdatingLocation()
         } else {
-            locationManager.requestWhenInUseAuthorization()
+            clLocationManager.requestWhenInUseAuthorization()
         }
     }
     
@@ -122,7 +122,9 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
             
             if !address.isEmpty {
                 self.koreanAddress = address
-                self.locationState = .success
+                DispatchQueue.main.async {
+                    self.locationState = .success
+                }
             } else {
                 self.koreanAddress = "상세 주소를 찾을 수 없습니다."
                 self.locationState = .error(NSError(domain: "LocationManager", code: 1, userInfo: [NSLocalizedDescriptionKey: "주소 정보 없음"]))
@@ -138,7 +140,9 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        locationState = .error(error)
+        DispatchQueue.main.async {
+            self.locationState = .error(error)
+        }
         koreanAddress = "위치를 가져오는 데 실패했습니다."
     }
     
@@ -156,7 +160,9 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
             locationState = .error(NSError(domain: "LocationManager", code: 2, userInfo: [NSLocalizedDescriptionKey: "위치 권한이 없습니다."]))
             koreanAddress = "위치 권한이 없습니다."
         case .notDetermined:
-            locationState = .idle
+            DispatchQueue.main.async {
+                self.locationState = .idle
+            }
         @unknown default:
             break
         }
