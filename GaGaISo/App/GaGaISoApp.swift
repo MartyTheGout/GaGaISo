@@ -8,7 +8,6 @@
 import SwiftUI
 import KakaoSDKCommon
 import KakaoSDKAuth
-import ComposableArchitecture
 import Toasts
 
 @main
