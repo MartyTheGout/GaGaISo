@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 final class RawNetworkClient {
     func request<T: Decodable>(_ request: URLRequest, responseType: T.Type) async -> Result<T, APIError> {
         
@@ -38,27 +37,88 @@ final class RawNetworkClient {
 
 final class StrategicNetworkHandler {
     private let client: RawNetworkClient
-    private let authManager: AuthenticationManager
+    private let authManager: AuthManagerProtocol
+    
+    private let maxTimeoutRetryAttempts = 3
+    private let baseDelaySeconds: Double = 1.0
 
-    init(client: RawNetworkClient, authManager: AuthenticationManager) {
+    init(client: RawNetworkClient, authManager: AuthManagerProtocol) {
         self.client = client
         self.authManager = authManager
     }
 
     func request<T: Decodable>(_ route: RouterProtocol, type: T.Type) async -> Result<T, APIError> {
+        return await requestWithTimeoutRetry(route, type: type, attempt: 1)
+    }
+    
+    private func requestWithTimeoutRetry<T: Decodable>(
+        _ route: RouterProtocol,
+        type: T.Type,
+        attempt: Int
+    ) async -> Result<T, APIError> {
         let request = route.createRequest(withToken: authManager.getAccessToken())
-        
         let result: Result<T, APIError> = await client.request(request, responseType: T.self)
-
-        if case .failure(let error) = result, case .invalidResponse(let code, _, _) = error, [419].contains(code) {
+        
+        print("===========================================")
+        dump(request)
+        dump(result)
+        print("===========================================")
+        
+        // Single retry after token refresh (no exponential backoff)
+        if case .failure(let error) = result,
+           case .invalidResponse(let code, _, _) = error,
+           code == 419 {
+            
             let refreshed = await authManager.tryRefreshIfNeeded()
             if refreshed {
-                return await client.request(request, responseType: type) // retry
+                return await client.request(request, responseType: type)
             } else {
                 return .failure(error)
             }
         }
-
+        
+        // Handle timeout errors with retry strategy
+        if case .failure(let error) = result,
+           isTimeoutError(error),
+           attempt <= maxTimeoutRetryAttempts {
+            print("⏱️ Timeout on attempt \(attempt). Retrying...")
+            
+            let delay = calculateRetryDelay(attempt: attempt)
+            print("⏳ Waiting \(String(format: "%.2f", Double(delay) / 1_000_000_000))s before retry...")
+            
+            try? await Task.sleep(nanoseconds: delay)
+            
+            return await requestWithTimeoutRetry(route, type: type, attempt: attempt + 1)
+        }
+        
         return result
+    }
+    
+    private func isTimeoutError(_ error: APIError) -> Bool {
+        switch error {
+        case .unknown(let underlyingError):
+            if let urlError = underlyingError as? URLError {
+                return urlError.code == .timedOut ||
+                       urlError.code == .networkConnectionLost ||
+                       urlError.code == .notConnectedToInternet
+            }
+            return false
+        default:
+            return false
+        }
+    }
+    
+    private func calculateRetryDelay(attempt: Int) -> UInt64 {
+        // Exponential backoff: baseDelay * 2^(attempt-1)
+        let exponentialDelay = baseDelaySeconds * pow(2.0, Double(attempt - 1))
+        
+        // Add random jitter (±25%) to avoid thundering herd
+        let jitterRange = 0.25
+        let jitter = Double.random(in: (1.0 - jitterRange)...(1.0 + jitterRange))
+        
+        let finalDelaySeconds = exponentialDelay * jitter
+        
+        // Convert to nanoseconds
+        return UInt64(finalDelaySeconds * 1_000_000_000)
     }
 }

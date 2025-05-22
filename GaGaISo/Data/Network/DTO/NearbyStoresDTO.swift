@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NearbyStoresDTO: Codable {
+struct NearbyStoresDTO: Decodable {
     let data: [StoreDTO]
     let nextCursor: String
 
@@ -17,7 +17,7 @@ struct NearbyStoresDTO: Codable {
     }
 }
 
-struct StoreDTO: Codable {
+struct StoreDTO: Decodable {
     let storeID: String
     let category: String
     let name: String
@@ -29,7 +29,7 @@ struct StoreDTO: Codable {
     let totalRating: Double
     let totalOrderCount, totalReviewCount: Int
     let geolocation: Geolocation
-    let distance: Double
+    let distance: Double?
     let createdAt, updatedAt: String
 
     enum CodingKeys: String, CodingKey {
