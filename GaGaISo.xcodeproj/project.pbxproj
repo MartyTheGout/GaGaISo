@@ -11,7 +11,7 @@
 		407D272E2DD342110043F141 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 407D272D2DD342110043F141 /* KakaoSDK */; };
 		407D27302DD342110043F141 /* KakaoSDKAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 407D272F2DD342110043F141 /* KakaoSDKAuth */; };
 		407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 407D27312DD342110043F141 /* KakaoSDKCommon */; };
-		40C059842DD75A080012671F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 40C059832DD75A080012671F /* ComposableArchitecture */; };
+		40813F9F2DDF3864001F3C10 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 40813F9E2DDF3864001F3C10 /* Kingfisher */; };
 		40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */ = {isa = PBXBuildFile; productRef = 40C05A5D2DD9CFD60012671F /* Toasts */; };
 /* End PBXBuildFile section */
 
@@ -85,8 +85,8 @@
 				40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */,
 				407D272E2DD342110043F141 /* KakaoSDK in Frameworks */,
 				407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */,
-				40C059842DD75A080012671F /* ComposableArchitecture in Frameworks */,
 				407D27302DD342110043F141 /* KakaoSDKAuth in Frameworks */,
+				40813F9F2DDF3864001F3C10 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,8 +150,8 @@
 				407D272D2DD342110043F141 /* KakaoSDK */,
 				407D272F2DD342110043F141 /* KakaoSDKAuth */,
 				407D27312DD342110043F141 /* KakaoSDKCommon */,
-				40C059832DD75A080012671F /* ComposableArchitecture */,
 				40C05A5D2DD9CFD60012671F /* Toasts */,
+				40813F9E2DDF3864001F3C10 /* Kingfisher */,
 			);
 			productName = GaGaISo;
 			productReference = 407D26712DD32AE90043F141 /* GaGaISo.app */;
@@ -168,7 +168,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				408138552DDB146A001F3C10 /* PBXTargetDependency */,
 				408138472DDB11F5001F3C10 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
@@ -211,8 +210,8 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				407D272C2DD342110043F141 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
-				40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				40C05A5C2DD9CFD60012671F /* XCRemoteSwiftPackageReference "swiftui-toasts" */,
+				40813F9D2DDF3864001F3C10 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 407D26722DD32AE90043F141 /* Products */;
@@ -265,10 +264,6 @@
 			isa = PBXTargetDependency;
 			target = 407D26702DD32AE90043F141 /* GaGaISo */;
 			targetProxy = 408138462DDB11F5001F3C10 /* PBXContainerItemProxy */;
-		};
-		408138552DDB146A001F3C10 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 408138542DDB146A001F3C10 /* ComposableArchitecture */;
 		};
 /* End PBXTargetDependency section */
 
@@ -549,12 +544,12 @@
 				minimumVersion = 2.24.2;
 			};
 		};
-		40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+		40813F9D2DDF3864001F3C10 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			repositoryURL = "https://github.com/onevcat/Kingfisher.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.19.1;
+				minimumVersion = 8.3.2;
 			};
 		};
 		40C05A5C2DD9CFD60012671F /* XCRemoteSwiftPackageReference "swiftui-toasts" */ = {
@@ -583,15 +578,10 @@
 			package = 407D272C2DD342110043F141 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
 			productName = KakaoSDKCommon;
 		};
-		408138542DDB146A001F3C10 /* ComposableArchitecture */ = {
+		40813F9E2DDF3864001F3C10 /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
-			productName = ComposableArchitecture;
-		};
-		40C059832DD75A080012671F /* ComposableArchitecture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 40C059822DD75A080012671F /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
-			productName = ComposableArchitecture;
+			package = 40813F9D2DDF3864001F3C10 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 		40C05A5D2DD9CFD60012671F /* Toasts */ = {
 			isa = XCSwiftPackageProductDependency;
