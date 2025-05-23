@@ -33,11 +33,11 @@ enum StoreRouter: RouterProtocol {
         switch self {
         case .v1LocationBasedStore:
             return "v1/stores"
-        case .v1StoreDetailInfo(storeId: let storeId):
+        case .v1StoreDetailInfo(let storeId):
             return "v1/stores/\(storeId)"
-        case .v1ExecuteStoreLike(storeId: let storeId):
+        case .v1ExecuteStoreLike(let storeId, _):
             return "v1/stores/\(storeId)/like"
-        case .v1SearchStore(name: let name):
+        case .v1SearchStore:
             return "v1/stores/search"
         case .v1GetPopularStore:
             return "v1/stores/popular-stores"
@@ -79,7 +79,7 @@ enum StoreRouter: RouterProtocol {
     }
     var body: Data? {
         switch self {
-        case .v1ExecuteStoreLike(let storeId, let status):
+        case .v1ExecuteStoreLike( _, let status):
             let dict = [
                 "like_status": status
             ]

@@ -59,7 +59,7 @@ struct InputField: View {
                 RoundedRectangle(cornerRadius: 20)
                     .stroke(Color.gray.opacity(0.4), lineWidth: 1)
             )
-            .onChange(of: isFocused) { newValue in
+            .onChange(of: isFocused, initial: false) { _, newValue in
                 onFocusChanged?(newValue)
             }
         }

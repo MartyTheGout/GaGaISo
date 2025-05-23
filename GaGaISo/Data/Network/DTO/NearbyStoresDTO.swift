@@ -8,8 +8,8 @@
 import Foundation
 
 struct NearbyStoresDTO: Decodable {
-    let data: [StoreDTO]
-    let nextCursor: String
+    var data: [StoreDTO]
+    var nextCursor: String
 
     enum CodingKeys: String, CodingKey {
         case data
@@ -18,19 +18,19 @@ struct NearbyStoresDTO: Decodable {
 }
 
 struct StoreDTO: Decodable {
-    let storeID: String
-    let category: String
-    let name: String
-    let close: String // "21:00"
-    let storeImageUrls: [String]
-    let isPicchelin, isPick: Bool
-    let pickCount: Int
-    let hashTags: [String]
-    let totalRating: Double
-    let totalOrderCount, totalReviewCount: Int
-    let geolocation: Geolocation
-    let distance: Double?
-    let createdAt, updatedAt: String
+    var storeID: String
+    var category: String
+    var name: String
+    var close: String // "21:00"
+    var storeImageUrls: [String]
+    var isPicchelin, isPick: Bool
+    var pickCount: Int
+    var hashTags: [String]
+    var totalRating: Double
+    var totalOrderCount, totalReviewCount: Int
+    var geolocation: Geolocation
+    var distance: Double?
+    var createdAt, updatedAt: String
 
     enum CodingKeys: String, CodingKey {
         case storeID = "store_id"
@@ -48,5 +48,5 @@ struct StoreDTO: Decodable {
 }
 
 struct Geolocation: Codable {
-    let longitude, latitude: Double
+    var longitude, latitude: Double
 }
