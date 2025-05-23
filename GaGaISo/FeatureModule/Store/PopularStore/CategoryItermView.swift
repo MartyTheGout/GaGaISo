@@ -14,25 +14,35 @@ struct CategoryItemView: View {
     var body: some View {
         Button(action: onTap) {
             VStack(spacing: 4) {
-                Image(systemName: getSystemImageName(for: category.icon))
-                    .font(.title2)
-                    .foregroundColor(category.isSelected ? .blue : .gray)
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(category.isSelected ? Color.brightForsythia.opacity(0.1) : Color.white)
+                        .frame(width: 56, height: 56)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(category.isSelected ? Color.brightForsythia : Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+                    
+                    Image(getImageName(for: category.icon))
+                        .font(.title2)
+                        .foregroundColor(category.isSelected ? .blackSprout : .gray60)
+                }
                 
                 Text(category.title)
-                    .font(.caption)
-                    .foregroundColor(category.isSelected ? .blue : .gray)
+                    .pretendardFont(size: .body3, weight: .bold)
+                    .foregroundColor(category.isSelected ? .blackSprout : .gray60)
             }
         }
         .buttonStyle(PlainButtonStyle())
     }
     
-    private func getSystemImageName(for icon: String) -> String {
+    private func getImageName(for icon: String) -> String {
         switch icon {
-        case "coffee": return "cup.and.saucer.fill"
-        case "fastfood": return "takeoutbag.and.cup.and.straw.fill"
-        case "desert": return "birthday.cake.fill"
-        case "bakery": return "croissant.fill"
-        case "etc": return "ellipsis.circle.fill"
+        case "coffee": return "coffee"
+        case "fastfood": return "fastfood"
+        case "desert": return "desert"
+        case "bakery": return "bakery"
+        case "etc": return "etc"
         default: return "questionmark.circle.fill"
         }
     }

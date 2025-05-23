@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct PopularStoreView: View {
+    @Environment(\.diContainer) private var diContainer
+    
     @StateObject private var viewModel: PopularStoreViewModel
     
     init(viewModel: PopularStoreViewModel) {
@@ -39,18 +41,12 @@ struct PopularStoreView: View {
             if viewModel.isLoading {
                 ProgressView("로딩 중...")
                     .frame(height: 200)
-            } else if let storeData = viewModel.storeData {
+            } else if !viewModel.storeIds.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-                        ForEach(storeData, id: \.storeID) { store in
+                        ForEach(viewModel.storeIds, id: \.self) { storeId in
                             TrendingStoreCard(
-                                store: store,
-                                onLikeTapped: { isLiked in
-                                    viewModel.executeLikeOn(
-                                        storeId: store.storeID,
-                                        likeStatus: isLiked
-                                    )
-                                }
+                                viewModel: diContainer.getTrendingStoreCardViewModel(storeId: storeId)
                             )
                         }
                     }

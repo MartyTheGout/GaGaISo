@@ -17,8 +17,8 @@ struct CategoryItem: Identifiable, Equatable {
 }
 
 class PopularStoreViewModel: ObservableObject {
-    
-    private var storeManager: StoreManager
+    private var storeService: StoreService
+    private let storeStateManager: StoreStateManager
     private var cancellables = Set<AnyCancellable>()
     
     @Published var categories: [CategoryItem] = [
@@ -29,15 +29,18 @@ class PopularStoreViewModel: ObservableObject {
         CategoryItem(icon: "etc", title: "more", isSelected: false)
     ]
     
-    @Published var storeData: [StoreDTO]?
+    @Published var storeIds: [String] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
-
-    private let likeActionSubject = PassthroughSubject<(storeId: String, likeStatus: Bool), Never>()
     
-    init(storeManager: StoreManager) {
-        self.storeManager = storeManager
-        setupLikeDebounce()
+    init(storeService: StoreService, storeStateManager: StoreStateManager) {
+        self.storeService = storeService
+        self.storeStateManager = storeStateManager
+        storeStateManager.$stores
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
     }
     
     func selectCategory(_ selectedCategory: CategoryItem) {
@@ -58,26 +61,25 @@ class PopularStoreViewModel: ObservableObject {
         categories.first { $0.isSelected }
     }
     
-    // MARK: - Data Loading
     func loadPopularStores() async {
         await MainActor.run {
             isLoading = true
             errorMessage = nil
         }
         
-//        do {
-            let stores = await storeManager.getTrendingStores("")
-            
-            await MainActor.run {
-                self.storeData = stores
-                self.isLoading = false
+        let result = await storeService.getTrendingStores("")
+        
+        await MainActor.run {
+            switch result {
+            case .success(let stores):
+                self.storeStateManager.updateStores(stores)
+                self.storeIds = stores.map { $0.storeID }
+            case .failure(let error):
+                self.errorMessage = error.localizedDescription
             }
-//        } catch {
-//            await MainActor.run {
-//                self.errorMessage = error.localizedDescription
-//                self.isLoading = false
-//            }
-//        }
+            
+            self.isLoading = false
+        }
     }
     
     private func loadStoresByCategory(_ category: String) async {
@@ -86,75 +88,21 @@ class PopularStoreViewModel: ObservableObject {
             errorMessage = nil
         }
         
-//        do {
-            let stores = await storeManager.getTrendingStores(selectedCategory!.title)
-            
-            await MainActor.run {
-                self.storeData = stores
-                self.isLoading = false
+        let result = await storeService.getTrendingStores(selectedCategory!.title)
+        
+        await MainActor.run {
+            switch result {
+            case .success(let stores):
+                self.storeStateManager.updateStores(stores)
+                self.storeIds = stores.map { $0.storeID }
+            case .failure(let error):
+                self.errorMessage =  error.localizedDescription
             }
-//        } catch {
-//            await MainActor.run {
-//                self.errorMessage = error.localizedDescription
-//                self.isLoading = false
-//            }
-//        }
+            self.isLoading = false
+        }
     }
-    
-    // MARK: - Like Action with Debounce
-    func executeLikeOn(storeId: String, likeStatus: Bool) {
-        // Subject에 액션 전송 (debounce 처리됨)
-        // 18번 연속 클릭하면 앞의 18번은 무시되고 마지막 1번만 실행
-        likeActionSubject.send((storeId: storeId, likeStatus: likeStatus))
-    }
-    
-    private func setupLikeDebounce() {
-        likeActionSubject
-            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main) // 300ms 대기
-            .removeDuplicates { previous, current in
-                // 같은 storeId에 대한 중복 요청 제거
-                previous.storeId == current.storeId && previous.likeStatus == current.likeStatus
-            }
-            .sink { [weak self] action in
-                Task {
-                    await self?.performLikeAction(
-                        storeId: action.storeId,
-                        likeStatus: action.likeStatus
-                    )
-                }
-            }
-            .store(in: &cancellables)
-    }
-    
-    private func performLikeAction(storeId: String, likeStatus: Bool) async {
-//        do {
-            // 실제 네트워크 API 호출 (순수 서버 통신만)
-            let success = await storeManager.updateStoreLike(
-                storeId: storeId,
-                isLiked: likeStatus
-            )
-            
-            if !success {
-                await MainActor.run {
-                    errorMessage = "좋아요 처리 중 오류가 발생했습니다."
-                }
-            }
-//        } catch {
-//            await MainActor.run {
-//                errorMessage = "네트워크 오류가 발생했습니다: \(error.localizedDescription)"
-//            }
-//        }
-    }
-    
-    func getStoreById(_ storeId: String) -> StoreDTO? {
-        storeData?.first { $0.storeID == storeId }
-    }
-    
+
     func refreshData() async {
         await loadStoresByCategory(selectedCategory!.title)
-    }
-    
-    func clearError() {
-        errorMessage = nil
     }
 }

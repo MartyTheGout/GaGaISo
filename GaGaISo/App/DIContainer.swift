@@ -8,14 +8,23 @@
 import Foundation
 
 class DIContainer: ObservableObject {
-    let authStore: AuthStore
-    let networkClient: RawNetworkClient
-    let authManager: AuthManagerProtocol
+    
     let notificationManager: NotificationManager
+    
+    let authStore: AuthStore
+    let authManager: AuthManagerProtocol
+    
     let locationManager: LocationManager
-    let kakaoUserApi: KakaoUserApiProtocol
+    
+    let networkClient: RawNetworkClient
     let networkManager: StrategicNetworkHandler
-    let storeManager: StoreManager
+    
+    let kakaoUserApi: KakaoUserApiProtocol
+    
+    let storeService: StoreService
+    let storeStateManager: StoreStateManager
+    
+    let imageService: ImageService
     
     init(
         authStore: AuthStore = AuthStore(),
@@ -36,7 +45,9 @@ class DIContainer: ObservableObject {
         )
         
         self.networkManager = StrategicNetworkHandler(client: networkClient, authManager: authManager)
-        self.storeManager = StoreManager(networkManager: networkManager)
+        self.storeService = StoreService(networkManager: networkManager)
+        self.storeStateManager = StoreStateManager(storeService: storeService)
+        self.imageService = ImageService(authManager: authManager, networkManager: networkManager)
     }
     
     func getEntryViewModel() -> AppEntryViewModel {
@@ -71,10 +82,14 @@ class DIContainer: ObservableObject {
     }
     
     func getPopularKeywordViewModel() -> PopularKeywordViewModel {
-        PopularKeywordViewModel(storeManager: storeManager)
+        PopularKeywordViewModel(storeService: storeService)
     }
     
     func getPoupularStoreViewModel() -> PopularStoreViewModel {
-        PopularStoreViewModel(storeManager: storeManager)
+        PopularStoreViewModel(storeService: storeService, storeStateManager: storeStateManager)
+    }
+    
+    func getTrendingStoreCardViewModel(storeId: String) -> TrendingStoreCardViewModel {
+        TrendingStoreCardViewModel(storeId: storeId, storeStateManager: storeStateManager, imageService: imageService)
     }
 }

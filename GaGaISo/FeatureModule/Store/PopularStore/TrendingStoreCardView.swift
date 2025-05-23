@@ -8,17 +8,34 @@
 import SwiftUI
 
 struct TrendingStoreCard: View {
-    var store: StoreDTO
-    let onLikeTapped: (Bool) -> Void
+    
+    @StateObject var viewModel: TrendingStoreCardViewModel
+    
+    init(viewModel: TrendingStoreCardViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            AsyncImage(url: URL(string: ExternalDatasource.pickup.baseURLString + "v1/\(store.storeImageUrls[0])")) { image in
-                image
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } placeholder: {
-                Color.gray.opacity(0.3)
+            Group {
+                if let storeImage = viewModel.storeImage {
+                    Image(uiImage: storeImage)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } else if viewModel.isImageLoading {
+                    ZStack {
+                        Color.gray.opacity(0.3)
+                        ProgressView()
+                            .tint(.blackSprout)
+                    }
+                } else {
+                    ZStack {
+                        Color.gray.opacity(0.3)
+                        Image(systemName: "photo")
+                            .foregroundColor(.gray)
+                            .font(.largeTitle)
+                    }
+                }
             }
             .frame(width: 250, height: 200)
             .clipped()
@@ -26,16 +43,16 @@ struct TrendingStoreCard: View {
             VStack {
                 HStack {
                     Button(action: {
-                        onLikeTapped(!store.isPick)
+                        viewModel.toggleLike()
                     }) {
-                        Image(systemName: store.isPick ? "heart.fill" : "heart")
-                            .foregroundColor(store.isPick ? .red : .white)
+                        Image(systemName: viewModel.isPick ? "heart.fill" : "heart")
+                            .foregroundColor(viewModel.isPick ? .red : .white)
                             .padding(8)
                     }
                     
                     Spacer()
                     
-                    if store.isPicchelin {
+                    if viewModel.isPicchelin {
                         Button(action: {
                             // 픽슐랭 액션
                         }) {
@@ -61,7 +78,7 @@ struct TrendingStoreCard: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    Text(store.name)
+                    Text(viewModel.name)
                         .foregroundStyle(.gray90)
                         .pretendardFont(size: .body3, weight: .bold)
                     
@@ -72,22 +89,22 @@ struct TrendingStoreCard: View {
                             .foregroundColor(.brightForsythia)
                             .pretendardFont(size: .body3, weight: .bold)
                         
-                        Text("\(store.totalReviewCount)개")
+                        Text("\(viewModel.totalReviewCount)개")
                             .foregroundStyle(.gray90)
                             .pretendardFont(size: .body3, weight: .bold)
                     }
                 }
                 
                 HStack(spacing: 12) {
-                    Label("\(String(format: "%.1f", store.distance ?? "---"))km", systemImage: "location.fill")
+                    Label("\(String(format: "%.1f", viewModel.distance))km", systemImage: "location.fill")
                         .pretendardFont(size: .body3)
                         .foregroundStyle(.blackSprout)
                     
-                    Label(store.close, systemImage: "clock.fill")
+                    Label(viewModel.closeTime, systemImage: "clock.fill")
                         .pretendardFont(size: .body3)
                         .foregroundStyle(.blackSprout)
                     
-                    Label("\(store.pickCount)회", systemImage: "person.fill")
+                    Label("\(viewModel.pickCount)회", systemImage: "person.fill")
                         .pretendardFont(size: .body3)
                         .foregroundStyle(.blackSprout)
                 }
@@ -101,26 +118,8 @@ struct TrendingStoreCard: View {
         }
         .frame(width: 250, height: 200)
         .cornerRadius(12)
+        .onAppear() {
+            viewModel.loadStoreImage()
+        }
     }
-}
-
-#Preview {
-    TrendingStoreCard(store: .init(
-        storeID: "",
-        category: "coffee",
-        name: "냥냥냥",
-        close: "19:00",
-        storeImageUrls: [""],
-        isPicchelin: true,
-        isPick: true,
-        pickCount: 1900,
-        hashTags: ["오이시이", "슥고이"],
-        totalRating: 2.9,
-        totalOrderCount: 100,
-        totalReviewCount: 100,
-        geolocation: .init(longitude: 1343.342, latitude: 3423.343),
-        distance: 129,
-        createdAt: "2020-01-01T01:01:01Z",
-        updatedAt: "2020-01-01T01:01:01Z"
-    ), onLikeTapped: {_ in })
 }
