@@ -13,7 +13,7 @@ class TrendingStoreCardViewModel: ObservableObject {
     
     let storeId: String
     
-    private let storeStateManager: StoreStateManager
+    private let storeContext: StoreContext
     private let imageService: ImageService
     private var cancellables = Set<AnyCancellable>()
     
@@ -22,15 +22,15 @@ class TrendingStoreCardViewModel: ObservableObject {
     @Published var imageLoadError: String?
     
     var store: StoreDTO? {
-        storeStateManager.store(for: storeId)
+        storeContext.store(for: storeId)
     }
     
-    init(storeId: String, storeStateManager: StoreStateManager, imageService: ImageService) {
+    init(storeId: String, storeContext: StoreContext, imageService: ImageService) {
         self.storeId = storeId
-        self.storeStateManager = storeStateManager
+        self.storeContext = storeContext
         self.imageService = imageService
         
-        storeStateManager.$stores
+        storeContext.$stores
             .map { $0[storeId] }
             .removeDuplicates(by: { oldStore, newStore in // or Make StoreDTO Equtable
                 oldStore?.storeID == newStore?.storeID &&
@@ -71,54 +71,54 @@ class TrendingStoreCardViewModel: ObservableObject {
     
     func toggleLike() {
         Task {
-            await storeStateManager.toggleLike(for: storeId)
+            await storeContext.toggleLike(for: storeId)
         }
     }
 }
 
 extension TrendingStoreCardViewModel {
     var hasStore: Bool {
-        storeStateManager.store(for: storeId) != nil
+        storeContext.store(for: storeId) != nil
     }
     
     var name: String {
-        storeStateManager.store(for: storeId)?.name ?? "로딩 중..."
+        storeContext.store(for: storeId)?.name ?? "로딩 중..."
     }
     
     var isPick: Bool {
-        storeStateManager.store(for: storeId)?.isPick ?? false
+        storeContext.store(for: storeId)?.isPick ?? false
     }
     
     var isPicchelin: Bool {
-        storeStateManager.store(for: storeId)?.isPicchelin ?? false
+        storeContext.store(for: storeId)?.isPicchelin ?? false
     }
     
     var distance: String {
-        if let distance = storeStateManager.store(for: storeId)?.distance {
+        if let distance = storeContext.store(for: storeId)?.distance {
             return String(format: "%.1f", distance)
         }
         return "---"
     }
     
     var closeTime: String {
-        storeStateManager.store(for: storeId)?.close ?? "--:--"
+        storeContext.store(for: storeId)?.close ?? "--:--"
     }
     
     var pickCount: String {
-        if let count = storeStateManager.store(for: storeId)?.pickCount {
+        if let count = storeContext.store(for: storeId)?.pickCount {
             return "\(count)회"
         }
         return "0회"
     }
     
     var totalReviewCount: String {
-        if let count = storeStateManager.store(for: storeId)?.totalReviewCount {
+        if let count = storeContext.store(for: storeId)?.totalReviewCount {
             return "\(count)개"
         }
         return "0개"
     }
     
     var storeImageUrls: [String] {
-        storeStateManager.store(for: storeId)?.storeImageUrls ?? []
+        storeContext.store(for: storeId)?.storeImageUrls ?? []
     }
 }

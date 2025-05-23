@@ -22,7 +22,7 @@ class DIContainer: ObservableObject {
     let kakaoUserApi: KakaoUserApiProtocol
     
     let storeService: StoreService
-    let storeStateManager: StoreStateManager
+    let storeContext: StoreContext
     
     let imageService: ImageService
     
@@ -46,8 +46,8 @@ class DIContainer: ObservableObject {
         
         self.networkManager = StrategicNetworkHandler(client: networkClient, authManager: authManager)
         self.storeService = StoreService(networkManager: networkManager)
-        self.storeStateManager = StoreStateManager(storeService: storeService)
-        self.imageService = ImageService(authManager: authManager, networkManager: networkManager)
+        self.storeContext = StoreContext(storeService: storeService)
+        self.imageService = ImageService(networkManager: networkManager)
     }
     
     func getEntryViewModel() -> AppEntryViewModel {
@@ -86,10 +86,10 @@ class DIContainer: ObservableObject {
     }
     
     func getPoupularStoreViewModel() -> PopularStoreViewModel {
-        PopularStoreViewModel(storeService: storeService, storeStateManager: storeStateManager)
+        PopularStoreViewModel(storeService: storeService, storeContext: storeContext)
     }
     
     func getTrendingStoreCardViewModel(storeId: String) -> TrendingStoreCardViewModel {
-        TrendingStoreCardViewModel(storeId: storeId, storeStateManager: storeStateManager, imageService: imageService)
+        TrendingStoreCardViewModel(storeId: storeId, storeContext: storeContext, imageService: imageService)
     }
 }

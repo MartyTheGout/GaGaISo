@@ -18,7 +18,7 @@ struct CategoryItem: Identifiable, Equatable {
 
 class PopularStoreViewModel: ObservableObject {
     private var storeService: StoreService
-    private let storeStateManager: StoreStateManager
+    private let storeContext: StoreContext
     private var cancellables = Set<AnyCancellable>()
     
     @Published var categories: [CategoryItem] = [
@@ -33,10 +33,10 @@ class PopularStoreViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
-    init(storeService: StoreService, storeStateManager: StoreStateManager) {
+    init(storeService: StoreService, storeContext: StoreContext) {
         self.storeService = storeService
-        self.storeStateManager = storeStateManager
-        storeStateManager.$stores
+        self.storeContext = storeContext
+        storeContext.$stores
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
             }
@@ -72,7 +72,7 @@ class PopularStoreViewModel: ObservableObject {
         await MainActor.run {
             switch result {
             case .success(let stores):
-                self.storeStateManager.updateStores(stores)
+                self.storeContext.updateStores(stores)
                 self.storeIds = stores.map { $0.storeID }
             case .failure(let error):
                 self.errorMessage = error.localizedDescription
@@ -93,7 +93,7 @@ class PopularStoreViewModel: ObservableObject {
         await MainActor.run {
             switch result {
             case .success(let stores):
-                self.storeStateManager.updateStores(stores)
+                self.storeContext.updateStores(stores)
                 self.storeIds = stores.map { $0.storeID }
             case .failure(let error):
                 self.errorMessage =  error.localizedDescription

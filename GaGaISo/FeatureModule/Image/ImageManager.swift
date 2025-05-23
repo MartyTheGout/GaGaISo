@@ -9,12 +9,9 @@ import Foundation
 import UIKit
 
 class ImageService {
-    
-    let authManager: AuthManagerProtocol
     let networkManager: StrategicNetworkHandler
     
-    init(authManager: AuthManagerProtocol, networkManager: StrategicNetworkHandler) {
-        self.authManager = authManager
+    init(networkManager: StrategicNetworkHandler) {
         self.networkManager = networkManager
     }
     

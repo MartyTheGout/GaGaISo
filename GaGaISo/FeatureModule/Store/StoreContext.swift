@@ -1,5 +1,5 @@
 //
-//  StoreStateManager.swift
+//  StoreContextManager.swift
 //  GaGaISo
 //
 //  Created by marty.academy on 5/23/25.
@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class StoreStateManager: ObservableObject {
+class StoreContext: ObservableObject {
     @Published private(set) var stores: [String: StoreDTO] = [:]
     
     private let storeService: StoreService
