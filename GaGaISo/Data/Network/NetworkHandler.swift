@@ -26,6 +26,10 @@ final class RawNetworkClient {
             return .failure(.invalidResponse(statusCode: httpResponse.statusCode, url: request.url, body: String(data: data, encoding: .utf8)))
         }
         
+        if T.self == Data.self {
+            return .success(data as! T)
+        }
+        
         do {
             let decoded = try JSONDecoder().decode(T.self, from: data)
             return .success(decoded)
@@ -41,12 +45,12 @@ final class StrategicNetworkHandler {
     
     private let maxTimeoutRetryAttempts = 3
     private let baseDelaySeconds: Double = 1.0
-
+    
     init(client: RawNetworkClient, authManager: AuthManagerProtocol) {
         self.client = client
         self.authManager = authManager
     }
-
+    
     func request<T: Decodable>(_ route: RouterProtocol, type: T.Type) async -> Result<T, APIError> {
         return await requestWithTimeoutRetry(route, type: type, attempt: 1)
     }
@@ -99,8 +103,8 @@ final class StrategicNetworkHandler {
         case .unknown(let underlyingError):
             if let urlError = underlyingError as? URLError {
                 return urlError.code == .timedOut ||
-                       urlError.code == .networkConnectionLost ||
-                       urlError.code == .notConnectedToInternet
+                urlError.code == .networkConnectionLost ||
+                urlError.code == .notConnectedToInternet
             }
             return false
         default:
