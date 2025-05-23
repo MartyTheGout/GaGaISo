@@ -27,6 +27,9 @@ struct HomeView: View {
                 
                 VStack {
                     PopularStoreView(viewModel: diContainer.getPoupularStoreViewModel())
+                        .padding(.top)
+                    
+                    AdView(imageURL: "")
                     
                     FavoriteStoresSection(currentTab: $viewModel.currentTab)
                         .padding(.vertical)
