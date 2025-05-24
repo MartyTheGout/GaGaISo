@@ -89,7 +89,7 @@ struct TrendingStoreCard: View {
                             .foregroundColor(.brightForsythia)
                             .pretendardFont(size: .body3, weight: .bold)
                         
-                        Text("\(viewModel.totalReviewCount)개")
+                        Text(viewModel.totalReviewCount)
                             .foregroundStyle(.gray90)
                             .pretendardFont(size: .body3, weight: .bold)
                     }

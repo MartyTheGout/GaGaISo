@@ -112,9 +112,6 @@ class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
             
             let components = [
                 placemark.administrativeArea,
-                placemark.subLocality,
-                placemark.thoroughfare,
-                placemark.subThoroughfare,
                 placemark.name
             ]
             

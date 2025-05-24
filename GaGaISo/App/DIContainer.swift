@@ -92,4 +92,12 @@ class DIContainer: ObservableObject {
     func getTrendingStoreCardViewModel(storeId: String) -> TrendingStoreCardViewModel {
         TrendingStoreCardViewModel(storeId: storeId, storeContext: storeContext, imageService: imageService)
     }
+    
+    func getStoreListViewModel() -> StoreListViewModel {
+        StoreListViewModel(locationManager: locationManager, storeService: storeService, storeContext: storeContext)
+    }
+    
+    func getStoreItemViewModel(storeId: String) -> StoreItemViewModel {
+        StoreItemViewModel(storeId: storeId, storeContext: storeContext, imageService: imageService)
+    }
 }

@@ -36,7 +36,7 @@ class PopularStoreViewModel: ObservableObject {
     init(storeService: StoreService, storeContext: StoreContext) {
         self.storeService = storeService
         self.storeContext = storeContext
-        storeContext.$stores
+        storeContext.$trendingStoresLastUpdated
             .sink { [weak self] _ in
                 self?.objectWillChange.send()
             }
@@ -72,7 +72,7 @@ class PopularStoreViewModel: ObservableObject {
         await MainActor.run {
             switch result {
             case .success(let stores):
-                self.storeContext.updateStores(stores)
+                self.storeContext.updateTrendingStores(stores)
                 self.storeIds = stores.map { $0.storeID }
             case .failure(let error):
                 self.errorMessage = error.localizedDescription
@@ -93,7 +93,7 @@ class PopularStoreViewModel: ObservableObject {
         await MainActor.run {
             switch result {
             case .success(let stores):
-                self.storeContext.updateStores(stores)
+                self.storeContext.updateTrendingStores(stores)
                 self.storeIds = stores.map { $0.storeID }
             case .failure(let error):
                 self.errorMessage =  error.localizedDescription

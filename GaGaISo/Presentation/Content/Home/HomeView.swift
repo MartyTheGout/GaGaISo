@@ -34,22 +34,13 @@ struct HomeView: View {
                     FavoriteStoresSection(currentTab: $viewModel.currentTab)
                         .padding(.vertical)
                     
-                    if let store = viewModel.stores {
-                        StoreListView(store: store)
-                    }
+                    
+                    StoreListView(viewModel: diContainer.getStoreListViewModel())
+                    
                 }
                 .frame(maxWidth: .infinity)
                 .background(.gray0)
                 .cornerRadius(25, corners: [.topLeft, .topRight])
-            }
-            
-            .onAppear {
-                Task {
-                    await viewModel.onAppear()
-                }
-            }
-            .onDisappear {
-                viewModel.onDisappear()
             }
         }
         .background(Color.brightSprout.ignoresSafeArea())

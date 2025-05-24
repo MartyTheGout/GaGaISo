@@ -7,20 +7,38 @@
 import SwiftUI
 
 struct StoreCard: View {
-    var store : StoreDTO
+    
+    @StateObject var viewModel: StoreItemViewModel
+    
+    init(viewModel: StoreItemViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(spacing: 12) {
+            HStack(spacing: 6) {
                 ZStack(alignment: .topLeading) {
-                    AsyncImage(url: URL(string: ExternalDatasource.pickup.baseURLString + "v1/\(store.storeImageUrls[0])")) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    } placeholder: {
-                        Color.gray.opacity(0.3)
+                    Group {
+                        if let storeImage = viewModel.storeImages[safe: 0] {
+                            Image(uiImage: storeImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else if viewModel.isImageLoading {
+                            ZStack {
+                                Color.gray.opacity(0.3)
+                                ProgressView()
+                                    .tint(.blackSprout)
+                            }
+                        } else {
+                            ZStack {
+                                Color.gray.opacity(0.3)
+                                Image(systemName: "photo")
+                                    .foregroundColor(.gray)
+                                    .font(.largeTitle)
+                            }
+                        }
                     }
-                    .frame(width: 200, height: 150)
+                    .frame(width: 280, height: 150)
                     .cornerRadius(12)
                     
                     Button(action: {
@@ -55,32 +73,57 @@ struct StoreCard: View {
                     }
                 }
                 
-                VStack(spacing: 8) {
-                    AsyncImage(url: URL(string: ExternalDatasource.pickup.baseURLString + "v1/\(store.storeImageUrls[0])")) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    } placeholder: {
-                        Color.gray.opacity(0.3)
+                VStack(spacing: 6) {
+                    Group {
+                        if let storeImage = viewModel.storeImages[safe: 1] {
+                            Image(uiImage: storeImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else if viewModel.isImageLoading {
+                            ZStack {
+                                Color.gray.opacity(0.3)
+                                ProgressView()
+                                    .tint(.blackSprout)
+                            }
+                        } else {
+                            ZStack {
+                                Color.gray.opacity(0.3)
+                                Image(systemName: "photo")
+                                    .foregroundColor(.gray)
+                                    .font(.largeTitle)
+                            }
+                        }
                     }
-                    
                     .frame(width: 80, height: 70)
                     .cornerRadius(8)
-                    AsyncImage(url: URL(string: ExternalDatasource.pickup.baseURLString + "v1/\(store.storeImageUrls[0])")) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    } placeholder: {
-                        Color.gray.opacity(0.3)
-                    }
                     
+                    Group {
+                        if let storeImage = viewModel.storeImages[safe: 2] {
+                            Image(uiImage: storeImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else if viewModel.isImageLoading {
+                            ZStack {
+                                Color.gray.opacity(0.3)
+                                ProgressView()
+                                    .tint(.blackSprout)
+                            }
+                        } else {
+                            ZStack {
+                                Color.gray.opacity(0.3)
+                                Image(systemName: "photo")
+                                    .foregroundColor(.gray)
+                                    .font(.largeTitle)
+                            }
+                        }
+                    }
                     .frame(width: 80, height: 70)
                     .cornerRadius(8)
                 }
             }
             
             HStack {
-                Text(store.name)
+                Text(viewModel.name)
                     .foregroundStyle(.gray90)
                     .pretendardFont(size: .body1, weight: .bold)
                 
@@ -89,7 +132,7 @@ struct StoreCard: View {
                         .foregroundColor(.brightForsythia)
                         .pretendardFont(size: .body1, weight: .bold)
                     
-                    Text("\(store.totalReviewCount)개")
+                    Text(viewModel.totalReviewCount)
                         .foregroundStyle(.gray90)
                         .pretendardFont(size: .body1, weight: .bold)
                     
@@ -100,11 +143,11 @@ struct StoreCard: View {
                         .foregroundColor(.brightForsythia)
                         .pretendardFont(size: .body1, weight: .bold)
                     
-                    Text(String(format: "%.1f", store.totalRating))
+                    Text(String(format: "%.1f", viewModel.totalRating))
                         .pretendardFont(size: .body1, weight: .bold)
                         .foregroundStyle(.gray90)
                     
-                    Text("(\(store.pickCount))")
+                    Text("(\(viewModel.pickCount))")
                         .pretendardFont(size: .body1)
                         .foregroundStyle(.gray60)
                 }
@@ -112,21 +155,21 @@ struct StoreCard: View {
             .padding(.vertical, 4)
             
             HStack(spacing: 12) {
-                Label("\(String(format: "%.1f", store.distance ?? "---"))km", systemImage: "location.fill")
+                Label("\(String(format: "%.1f", viewModel.distance ?? "---"))km", systemImage: "location.fill")
                     .pretendardFont(size: .body2)
                     .foregroundStyle(.blackSprout)
                 
-                Label(store.close, systemImage: "clock.fill")
+                Label(viewModel.closeTime, systemImage: "clock.fill")
                     .pretendardFont(size: .body2)
                     .foregroundStyle(.blackSprout)
                 
-                Label("\(store.pickCount)회", systemImage: "person.fill")
+                Label("\(viewModel.pickCount)회", systemImage: "person.fill")
                     .pretendardFont(size: .body2)
                     .foregroundStyle(.blackSprout)
             }
             
             HStack {
-                ForEach(store.hashTags, id: \.self) { tag in
+                ForEach(viewModel.hashTags, id: \.self) { tag in
                     Text(tag)
                         .pretendardFont(size: .caption1, weight: .bold)
                         .padding(.horizontal, 8)
@@ -140,5 +183,8 @@ struct StoreCard: View {
         .padding(.vertical, 12)
         .background(.gray0)
         .cornerRadius(12)
+        .onAppear() {
+            viewModel.loadStoreImage()
+        }
     }
 }

@@ -1,15 +1,15 @@
 //
-//  TrendingStoreCardViewModel.swift
+//  StoreItemFeature.swift
 //  GaGaISo
 //
-//  Created by marty.academy on 5/23/25.
+//  Created by marty.academy on 5/21/25.
 //
 
 import Foundation
-import SwiftUI
 import Combine
+import SwiftUI
 
-class TrendingStoreCardViewModel: ObservableObject {
+class StoreItemViewModel: ObservableObject {
     
     let storeId: String
     
@@ -17,7 +17,7 @@ class TrendingStoreCardViewModel: ObservableObject {
     private let imageService: ImageService
     private var cancellables = Set<AnyCancellable>()
     
-    @Published var storeImage: UIImage?
+    @Published var storeImages: [UIImage] = []
     @Published var isImageLoading: Bool = false
     @Published var imageLoadError: String?
     
@@ -32,7 +32,7 @@ class TrendingStoreCardViewModel: ObservableObject {
         
         storeContext.$stores
             .map { $0[storeId] }
-            .removeDuplicates(by: { oldStore, newStore in
+            .removeDuplicates(by: { oldStore, newStore in // isItToomuch?
                 oldStore?.storeID == newStore?.storeID &&
                 oldStore?.isPick == newStore?.isPick &&
                 oldStore?.name == newStore?.name
@@ -46,8 +46,9 @@ class TrendingStoreCardViewModel: ObservableObject {
     func loadStoreImage() {
         guard let store, !store.storeImageUrls.isEmpty else { return }
         
-        let imageUrl = store.storeImageUrls[0]
-        loadImage(from: imageUrl)
+        for imageUrl in store.storeImageUrls {
+            loadImage(from: imageUrl)
+        }
     }
     
     private func loadImage(from urlString: String) {
@@ -60,7 +61,9 @@ class TrendingStoreCardViewModel: ObservableObject {
             await MainActor.run {
                 switch result {
                 case .success(let image):
-                    self.storeImage = image
+                    if let image {
+                        self.storeImages.append(image)
+                    }
                 case .failure(let error):
                     self.imageLoadError = error.localizedDescription
                 }
@@ -76,7 +79,7 @@ class TrendingStoreCardViewModel: ObservableObject {
     }
 }
 
-extension TrendingStoreCardViewModel {
+extension StoreItemViewModel {
     var hasStore: Bool {
         storeContext.store(for: storeId) != nil
     }
@@ -111,10 +114,25 @@ extension TrendingStoreCardViewModel {
         return "0회"
     }
     
+    var totalRating: String {
+        if let totalRating = storeContext.store(for: storeId)?.totalRating {
+            return "\(totalRating)"
+        }
+        return "0"
+    }
+    
     var totalReviewCount: String {
         if let count = storeContext.store(for: storeId)?.totalReviewCount {
             return "\(count)개"
         }
         return "0개"
+    }
+    
+    var storeImageUrls: [String] {
+        storeContext.store(for: storeId)?.storeImageUrls ?? []
+    }
+    
+    var hashTags: [String] {
+        storeContext.store(for: storeId)?.hashTags ?? []
     }
 }
