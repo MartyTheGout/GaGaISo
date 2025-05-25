@@ -69,7 +69,7 @@ struct StoreCard: View {
                             }
                             .padding(8)
                         }
-                        .frame(width: 200)
+                        .frame(width: 280)
                     }
                 }
                 
