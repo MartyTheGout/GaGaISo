@@ -24,7 +24,7 @@ class PopularStoreViewModel: ObservableObject {
     @Published var categories: [CategoryItem] = [
         CategoryItem(icon: "coffee", title: "커피", isSelected: false),
         CategoryItem(icon: "fastfood", title: "패스트푸드", isSelected: false),
-        CategoryItem(icon: "desert", title: "디저트", isSelected: true),
+        CategoryItem(icon: "desert", title: "디저트", isSelected: false),
         CategoryItem(icon: "bakery", title: "베이커리", isSelected: false),
         CategoryItem(icon: "etc", title: "more", isSelected: false)
     ]
@@ -88,7 +88,7 @@ class PopularStoreViewModel: ObservableObject {
             errorMessage = nil
         }
         
-        let result = await storeService.getTrendingStores(selectedCategory!.title)
+        let result = await storeService.getTrendingStores(category == "more" ? "" : category)
         
         await MainActor.run {
             switch result {
