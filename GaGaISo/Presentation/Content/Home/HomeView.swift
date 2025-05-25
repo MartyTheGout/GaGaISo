@@ -16,30 +16,32 @@ struct HomeView: View {
     }
     
     var body: some View {
-        ScrollView {
-            VStack {
-                LocationRevealingView(viewModel: diContainer.getLocationViewModel())
-                    .padding(.vertical)
-                
-                SearchBarView()
-                
-                PopularKeywordView(viewModel: diContainer.getPopularKeywordViewModel())
-                
+        NavigationStack {
+            ScrollView {
                 VStack {
-                    PopularStoreView(viewModel: diContainer.getPoupularStoreViewModel())
-                        .padding(.top)
+                    LocationRevealingView(viewModel: diContainer.getLocationViewModel())
+                        .padding(.vertical)
                     
-                    AdView(imageURL: "")
+                    SearchBarView()
                     
-                    StoreListView(viewModel: diContainer.getStoreListViewModel())
+                    PopularKeywordView(viewModel: diContainer.getPopularKeywordViewModel())
                     
+                    VStack {
+                        PopularStoreView(viewModel: diContainer.getPoupularStoreViewModel())
+                            .padding(.top)
+                        
+                        AdView(imageURL: "")
+                        
+                        StoreListView(viewModel: diContainer.getStoreListViewModel())
+                        
+                    }
+                    .frame(maxWidth: .infinity)
+                    .background(.gray0)
+                    .cornerRadius(25, corners: [.topLeft, .topRight])
                 }
-                .frame(maxWidth: .infinity)
-                .background(.gray0)
-                .cornerRadius(25, corners: [.topLeft, .topRight])
             }
+            .background(Color.brightSprout.ignoresSafeArea())
         }
-        .background(Color.brightSprout.ignoresSafeArea())
     }
 }
 

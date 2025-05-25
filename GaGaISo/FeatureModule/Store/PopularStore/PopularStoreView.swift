@@ -46,9 +46,13 @@ struct PopularStoreView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
                         ForEach(viewModel.storeIds, id: \.self) { storeId in
-                            TrendingStoreCard(
-                                viewModel: diContainer.getTrendingStoreCardViewModel(storeId: storeId)
-                            )
+                            NavigationLink {
+                                StoreDetailView(viewModel: diContainer.getStoreDetailViewModel(storeId: storeId))
+                            } label: {
+                                TrendingStoreCard(
+                                    viewModel: diContainer.getTrendingStoreCardViewModel(storeId: storeId)
+                                )
+                            }
                         }
                     }
                     .padding(.horizontal)

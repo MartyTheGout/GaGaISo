@@ -100,4 +100,12 @@ class DIContainer: ObservableObject {
     func getStoreItemViewModel(storeId: String) -> StoreItemViewModel {
         StoreItemViewModel(storeId: storeId, storeContext: storeContext, imageService: imageService)
     }
+    
+    func getStoreDetailViewModel(storeId: String) -> StoreDetailViewModel {
+        StoreDetailViewModel(storeId: storeId, storeService: storeService, imageService: imageService)
+    }
+    
+    func getMenuItemViewModel(menu: MenuList) -> MenuItemViewModel {
+        MenuItemViewModel(menu: menu, imageService: imageService)
+    }
 }

@@ -52,9 +52,7 @@ struct StoreCard: View {
                     VStack {
                         HStack {
                             Spacer()
-                            Button(action: {
-                                // 픽슐랭 액션
-                            }) {
+                            if viewModel.isPicchelin {
                                 HStack {
                                     Image(systemName: "paperplane.fill")
                                     Text("픽슐랭")
@@ -65,8 +63,8 @@ struct StoreCard: View {
                                 .background(.blackSprout)
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
+                                .padding(8)
                             }
-                            .padding(8)
                         }
                         .frame(width: 280)
                     }

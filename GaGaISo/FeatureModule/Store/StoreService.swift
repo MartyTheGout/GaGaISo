@@ -52,4 +52,8 @@ class StoreService {
         )
         return result.map { $0.data }.mapError { $0 as Error }
     }
+    
+    func getStoreDetail(storeId: String) async -> Result<StoreDetailDTO, Error> {
+        return  await networkManager.request(StoreRouter.v1StoreDetailInfo(storeId: storeId), type: StoreDetailDTO.self).mapError { $0 as Error }
+    }
 }
