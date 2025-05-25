@@ -54,7 +54,7 @@ struct FavoriteStoresSection: View {
                     currentTab = 1
                 }) {
                     HStack {
-                        Image(systemName: "checkmark.square")
+                        Image(systemName: "checkmark.square.fill")
                             .foregroundColor(currentTab == 1 ? .blackSprout : .brightSprout)
                         
                         Text("My Pick")

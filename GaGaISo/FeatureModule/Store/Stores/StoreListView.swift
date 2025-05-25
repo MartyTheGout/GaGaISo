@@ -16,8 +16,11 @@ struct StoreListView: View {
     
     var body: some View {
         VStack(spacing: 15) {
+            FavoriteStoresSection(currentTab: $viewModel.currentTab)
+            
             ForEach(viewModel.storeIds, id: \.self) { storeId in
                 StoreCard(viewModel: diContainer.getStoreItemViewModel(storeId: storeId))
+                Divider().padding(4)
             }
         }
     }

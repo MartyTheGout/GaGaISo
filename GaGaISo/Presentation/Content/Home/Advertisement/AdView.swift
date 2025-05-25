@@ -22,5 +22,8 @@ struct AdView: View {
         }
         .frame(height: 80)
         .frame(maxWidth: .infinity)
+        .overlay {
+            Text("광고는 준비 중 :-)")
+        }
     }
 }

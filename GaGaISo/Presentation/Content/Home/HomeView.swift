@@ -31,10 +31,6 @@ struct HomeView: View {
                     
                     AdView(imageURL: "")
                     
-                    FavoriteStoresSection(currentTab: $viewModel.currentTab)
-                        .padding(.vertical)
-                    
-                    
                     StoreListView(viewModel: diContainer.getStoreListViewModel())
                     
                 }

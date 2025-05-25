@@ -44,4 +44,12 @@ class StoreService {
         
         return result.map { $0.data }.mapError { $0 as Error }
     }
+    
+    func getLikedStores(category: String = "", next : String = "") async -> Result<[StoreDTO], Error> {
+        let result = await networkManager.request(
+            StoreRouter.v1GetLikedStore(category: category, next: next, limit: 10),
+            type: NearbyStoresDTO.self
+        )
+        return result.map { $0.data }.mapError { $0 as Error }
+    }
 }
