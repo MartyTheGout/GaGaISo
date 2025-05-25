@@ -36,7 +36,8 @@ struct PopularStoreView: View {
                     .foregroundStyle(.gray90)
                 Spacer()
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top)
             
             if viewModel.isLoading {
                 ProgressView("로딩 중...")
@@ -51,6 +52,7 @@ struct PopularStoreView: View {
                         }
                     }
                     .padding(.horizontal)
+                    .padding(.bottom)
                 }
             } else {
                 VStack {
