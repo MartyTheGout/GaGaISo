@@ -38,7 +38,6 @@ struct TrendingStoreCard: View {
                 }
             }
             .frame(width: 250, height: 200)
-            .clipped()
             
             VStack {
                 HStack {
@@ -85,10 +84,11 @@ struct TrendingStoreCard: View {
                     Spacer()
                     
                     HStack(spacing: 4) {
-                        Image(systemName: "heart.fill")
-                            .foregroundColor(.brightForsythia)
-                            .pretendardFont(size: .body3, weight: .bold)
                         
+                        Text("리뷰")
+                            .foregroundStyle(.blackSprout)
+                            .pretendardFont(size: .body3, weight: .bold)
+                           
                         Text(viewModel.totalReviewCount)
                             .foregroundStyle(.gray90)
                             .pretendardFont(size: .body3, weight: .bold)
@@ -96,7 +96,7 @@ struct TrendingStoreCard: View {
                 }
                 
                 HStack(spacing: 12) {
-                    Label("\(String(format: "%.1f", viewModel.distance))km", systemImage: "location.fill")
+                    Label(viewModel.totalOrderCount, systemImage: "bag.fill")
                         .pretendardFont(size: .body3)
                         .foregroundStyle(.blackSprout)
                     
@@ -104,7 +104,7 @@ struct TrendingStoreCard: View {
                         .pretendardFont(size: .body3)
                         .foregroundStyle(.blackSprout)
                     
-                    Label("\(viewModel.pickCount)회", systemImage: "person.fill")
+                    Label(viewModel.totalRating, systemImage: "star.bubble")
                         .pretendardFont(size: .body3)
                         .foregroundStyle(.blackSprout)
                 }
@@ -117,7 +117,9 @@ struct TrendingStoreCard: View {
             .frame(width: 250)
         }
         .frame(width: 250, height: 200)
+        .background(.clear)
         .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.08), radius: 6, x: 0, y: 2)
         .onAppear() {
             viewModel.loadStoreImage()
         }

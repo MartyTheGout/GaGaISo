@@ -93,13 +93,6 @@ extension TrendingStoreCardViewModel {
         storeContext.store(for: storeId)?.isPicchelin ?? false
     }
     
-    var distance: String {
-        if let distance = storeContext.store(for: storeId)?.distance {
-            return String(format: "%.1f", distance)
-        }
-        return "---"
-    }
-    
     var closeTime: String {
         storeContext.store(for: storeId)?.close ?? "--:--"
     }
@@ -116,5 +109,19 @@ extension TrendingStoreCardViewModel {
             return "\(count)개"
         }
         return "0개"
+    }
+    
+    var totalOrderCount: String {
+        if let count = storeContext.store(for: storeId)?.totalOrderCount {
+            return "\(count)회"
+        }
+        return "0회"
+    }
+    
+    var totalRating: String {
+        if let count = storeContext.store(for: storeId)?.totalRating {
+            return "\(count)"
+        }
+        return "0.0"
     }
 }

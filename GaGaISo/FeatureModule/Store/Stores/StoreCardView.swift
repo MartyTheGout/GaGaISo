@@ -42,7 +42,6 @@ struct StoreCard: View {
                     .cornerRadius(12)
                     
                     Button(action: {
-                        print("action")
                     }) {
                         Image(systemName: "heart")
                             .foregroundColor( .white)
@@ -128,34 +127,31 @@ struct StoreCard: View {
                     .pretendardFont(size: .body1, weight: .bold)
                 
                 HStack(spacing: 4) {
-                    Image(systemName: "heart.fill")
+                    Image(systemName: "star.bubble.fill")
                         .foregroundColor(.brightForsythia)
                         .pretendardFont(size: .body1, weight: .bold)
                     
-                    Text(viewModel.totalReviewCount)
+                    Text(viewModel.totalReviewCount)// Review Count 와 Rating 이 맞지 않다. 
                         .foregroundStyle(.gray90)
                         .pretendardFont(size: .body1, weight: .bold)
                     
                 }
+                .padding(.leading, 8)
                 
                 HStack(spacing: 2) {
                     Image(systemName: "star.fill")
                         .foregroundColor(.brightForsythia)
                         .pretendardFont(size: .body1, weight: .bold)
                     
-                    Text(String(format: "%.1f", viewModel.totalRating))
+                    Text(viewModel.totalRating)
                         .pretendardFont(size: .body1, weight: .bold)
                         .foregroundStyle(.gray90)
-                    
-                    Text("(\(viewModel.pickCount))")
-                        .pretendardFont(size: .body1)
-                        .foregroundStyle(.gray60)
                 }
             }
             .padding(.vertical, 4)
             
             HStack(spacing: 12) {
-                Label("\(String(format: "%.1f", viewModel.distance ?? "---"))km", systemImage: "location.fill")
+                Label(viewModel.distance, systemImage: "location.fill")
                     .pretendardFont(size: .body2)
                     .foregroundStyle(.blackSprout)
                 
@@ -163,7 +159,7 @@ struct StoreCard: View {
                     .pretendardFont(size: .body2)
                     .foregroundStyle(.blackSprout)
                 
-                Label("\(viewModel.pickCount)회", systemImage: "person.fill")
+                Label(viewModel.totalOrderCount, systemImage: "bag.fill")
                     .pretendardFont(size: .body2)
                     .foregroundStyle(.blackSprout)
             }
@@ -173,14 +169,13 @@ struct StoreCard: View {
                     Text(tag)
                         .pretendardFont(size: .caption1, weight: .bold)
                         .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .padding(.top, 4)
                         .background(.deepSprout)
                         .cornerRadius(5)
                         .foregroundColor(.gray0)
                 }
             }
         }
-        .padding(.vertical, 12)
         .background(.gray0)
         .cornerRadius(12)
         .onAppear() {

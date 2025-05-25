@@ -98,7 +98,7 @@ extension StoreItemViewModel {
     
     var distance: String {
         if let distance = storeContext.store(for: storeId)?.distance {
-            return String(format: "%.1f", distance)
+            return String(format: "%.1f", distance) + "km"
         }
         return "---"
     }
@@ -134,5 +134,12 @@ extension StoreItemViewModel {
     
     var hashTags: [String] {
         storeContext.store(for: storeId)?.hashTags ?? []
+    }
+    
+    var totalOrderCount: String {
+        if let count = storeContext.store(for: storeId)?.totalOrderCount {
+            return "\(count)회"
+        }
+        return "0회"
     }
 }
