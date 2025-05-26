@@ -25,16 +25,19 @@ enum ChatRouter: RouterProtocol {
         switch self {
         case .v1CreateChat: return "v1/chats"
         case .v1ListChat: return "v1/chats"
-        case .v1SendMessage(let roomId, let messsage, let fileURL) : return "v1/chats/\(roomId)"
-        case .v1GetChatRecord(let roomId, let since): return "v1/chats/\(roomId)"
-        case .v1UploadFilesOnChat(let roomId, let file): return "v1/chats/\(roomId)/files"
+        case .v1SendMessage(let roomId, _, _) : return "v1/chats/\(roomId)"
+        case .v1GetChatRecord(let roomId, _): return "v1/chats/\(roomId)"
+        case .v1UploadFilesOnChat(let roomId, _): return "v1/chats/\(roomId)/files"
         }
     }
     
     var parameter : [URLQueryItem] {
         switch self {
         case .v1GetChatRecord(let roomId, let since):
-            return [.init(name: "next", value: since)]
+            return [
+                .init(name: "room_id", value: roomId),
+                .init(name: "next", value: since)
+            ]
         default: return []
         }
     }
@@ -50,7 +53,7 @@ enum ChatRouter: RouterProtocol {
         case .v1ListChat:
             return nil
             
-        case .v1SendMessage(let roomId, let message, let fileURL):
+        case .v1SendMessage(_, let message, let fileURL):
             let dict = [
                 "content": message,
                 "files": [
@@ -59,7 +62,7 @@ enum ChatRouter: RouterProtocol {
             ] as [String : Any]
             return try? JSONSerialization.data(withJSONObject: dict)
             
-        case .v1UploadFilesOnChat(let roomId, let file):
+        case .v1UploadFilesOnChat(_, let file):
             let dict = [
                 "files": file,
             ]
