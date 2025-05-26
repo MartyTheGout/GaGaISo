@@ -13,6 +13,7 @@
 		407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 407D27312DD342110043F141 /* KakaoSDKCommon */; };
 		40813F9F2DDF3864001F3C10 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 40813F9E2DDF3864001F3C10 /* Kingfisher */; };
 		40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */ = {isa = PBXBuildFile; productRef = 40C05A5D2DD9CFD60012671F /* Toasts */; };
+		40D86F852DE4984000BF4D00 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 40D86F842DE4984000BF4D00 /* SocketIO */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -87,6 +88,7 @@
 				407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */,
 				407D27302DD342110043F141 /* KakaoSDKAuth in Frameworks */,
 				40813F9F2DDF3864001F3C10 /* Kingfisher in Frameworks */,
+				40D86F852DE4984000BF4D00 /* SocketIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,6 +154,7 @@
 				407D27312DD342110043F141 /* KakaoSDKCommon */,
 				40C05A5D2DD9CFD60012671F /* Toasts */,
 				40813F9E2DDF3864001F3C10 /* Kingfisher */,
+				40D86F842DE4984000BF4D00 /* SocketIO */,
 			);
 			productName = GaGaISo;
 			productReference = 407D26712DD32AE90043F141 /* GaGaISo.app */;
@@ -212,6 +215,7 @@
 				407D272C2DD342110043F141 /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 				40C05A5C2DD9CFD60012671F /* XCRemoteSwiftPackageReference "swiftui-toasts" */,
 				40813F9D2DDF3864001F3C10 /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				40D86F832DE4984000BF4D00 /* XCRemoteSwiftPackageReference "socket" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 407D26722DD32AE90043F141 /* Products */;
@@ -560,6 +564,14 @@
 				minimumVersion = 1.0.2;
 			};
 		};
+		40D86F832DE4984000BF4D00 /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				kind = exactVersion;
+				version = 16.1.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -587,6 +599,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 40C05A5C2DD9CFD60012671F /* XCRemoteSwiftPackageReference "swiftui-toasts" */;
 			productName = Toasts;
+		};
+		40D86F842DE4984000BF4D00 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40D86F832DE4984000BF4D00 /* XCRemoteSwiftPackageReference "socket" */;
+			productName = SocketIO;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
