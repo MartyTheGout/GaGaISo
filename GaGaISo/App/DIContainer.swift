@@ -26,6 +26,8 @@ class DIContainer: ObservableObject {
     
     let imageService: ImageService
     
+    let orderContext: OrderContext
+    
     init(
         authStore: AuthStore = AuthStore(),
         networkClient: RawNetworkClient = RawNetworkClient(),
@@ -48,6 +50,7 @@ class DIContainer: ObservableObject {
         self.storeService = StoreService(networkManager: networkManager)
         self.storeContext = StoreContext(storeService: storeService)
         self.imageService = ImageService(networkManager: networkManager)
+        self.orderContext = OrderContext()
     }
     
     func getEntryViewModel() -> AppEntryViewModel {
@@ -107,5 +110,9 @@ class DIContainer: ObservableObject {
     
     func getMenuItemViewModel(menu: MenuList) -> MenuItemViewModel {
         MenuItemViewModel(menu: menu, imageService: imageService)
+    }
+    
+    func getMenuDetailViewModel(menu: MenuList) -> MenuDetailViewModel {
+        MenuDetailViewModel(menu: menu, imageService: imageService, orderContext: orderContext)
     }
 }

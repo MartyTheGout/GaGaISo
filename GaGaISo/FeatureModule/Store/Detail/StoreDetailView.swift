@@ -368,7 +368,12 @@ struct StoreDetailView: View {
     private var menuListSection: some View {
         LazyVStack(spacing: 16) {
             ForEach(filteredMenus, id: \.menuID) { menu in
-                MenuItemView(viewModel: diContainer.getMenuItemViewModel(menu: menu))
+                NavigationLink {
+                    MenuDetailView(viewModel: diContainer.getMenuDetailViewModel(menu: menu))
+                } label: {
+                    MenuItemView(viewModel: diContainer.getMenuItemViewModel(menu: menu))
+                }
+
                 Divider()
             }
         }
