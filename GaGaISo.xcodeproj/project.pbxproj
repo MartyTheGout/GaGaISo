@@ -14,6 +14,7 @@
 		40813F9F2DDF3864001F3C10 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 40813F9E2DDF3864001F3C10 /* Kingfisher */; };
 		40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */ = {isa = PBXBuildFile; productRef = 40C05A5D2DD9CFD60012671F /* Toasts */; };
 		40D86F852DE4984000BF4D00 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 40D86F842DE4984000BF4D00 /* SocketIO */; };
+		40D870762DE4B2BE00BF4D00 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 40D870752DE4B2BE00BF4D00 /* RealmSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,7 @@
 			files = (
 				40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */,
 				407D272E2DD342110043F141 /* KakaoSDK in Frameworks */,
+				40D870762DE4B2BE00BF4D00 /* RealmSwift in Frameworks */,
 				407D27322DD342110043F141 /* KakaoSDKCommon in Frameworks */,
 				407D27302DD342110043F141 /* KakaoSDKAuth in Frameworks */,
 				40813F9F2DDF3864001F3C10 /* Kingfisher in Frameworks */,
@@ -155,6 +157,7 @@
 				40C05A5D2DD9CFD60012671F /* Toasts */,
 				40813F9E2DDF3864001F3C10 /* Kingfisher */,
 				40D86F842DE4984000BF4D00 /* SocketIO */,
+				40D870752DE4B2BE00BF4D00 /* RealmSwift */,
 			);
 			productName = GaGaISo;
 			productReference = 407D26712DD32AE90043F141 /* GaGaISo.app */;
@@ -216,6 +219,7 @@
 				40C05A5C2DD9CFD60012671F /* XCRemoteSwiftPackageReference "swiftui-toasts" */,
 				40813F9D2DDF3864001F3C10 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				40D86F832DE4984000BF4D00 /* XCRemoteSwiftPackageReference "socket" */,
+				40D870742DE4B2BE00BF4D00 /* XCRemoteSwiftPackageReference "realm-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 407D26722DD32AE90043F141 /* Products */;
@@ -572,6 +576,14 @@
 				version = 16.1.1;
 			};
 		};
+		40D870742DE4B2BE00BF4D00 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				kind = exactVersion;
+				version = 20.0.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -604,6 +616,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 40D86F832DE4984000BF4D00 /* XCRemoteSwiftPackageReference "socket" */;
 			productName = SocketIO;
+		};
+		40D870752DE4B2BE00BF4D00 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40D870742DE4B2BE00BF4D00 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
