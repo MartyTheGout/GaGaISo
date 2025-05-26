@@ -10,7 +10,7 @@ import Foundation
 enum ChatRouter: RouterProtocol {
     case v1CreateChat(opponent: String)
     case v1ListChat
-    case v1SendMessage(roomId: String, message: String, fileURL: String)
+    case v1SendMessage(roomId: String, message: String, fileURL: [String]?)
     case v1GetChatRecord(roomId: String, since: String)
     case v1UploadFilesOnChat(roomId: String, file: Array<String> )
     

@@ -28,6 +28,9 @@ class DIContainer: ObservableObject {
     
     let orderContext: OrderContext
     
+    let chatContext: ChatContext
+    let chatService: ChatService
+    
     init(
         authStore: AuthStore = AuthStore(),
         networkClient: RawNetworkClient = RawNetworkClient(),
@@ -51,6 +54,9 @@ class DIContainer: ObservableObject {
         self.storeContext = StoreContext(storeService: storeService)
         self.imageService = ImageService(networkManager: networkManager)
         self.orderContext = OrderContext()
+        
+        self.chatService = ChatService(networkManager: networkManager)
+        self.chatContext = ChatContext(chatService: chatService)
     }
     
     func getEntryViewModel() -> AppEntryViewModel {
@@ -114,5 +120,13 @@ class DIContainer: ObservableObject {
     
     func getMenuDetailViewModel(menu: MenuList) -> MenuDetailViewModel {
         MenuDetailViewModel(menu: menu, imageService: imageService, orderContext: orderContext)
+    }
+    
+    func getChatListViewModel() -> ChatListViewModel {
+        ChatListViewModel(chatContext: chatContext)
+    }
+    
+    func getChatRoomViewModel(roomId: String) -> ChatRoomViewModel {
+        ChatRoomViewModel(roomId: roomId, chatContext: chatContext)
     }
 }
