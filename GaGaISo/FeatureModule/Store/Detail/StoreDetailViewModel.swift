@@ -160,5 +160,10 @@ extension StoreDetailViewModel {
     var storeImageUrls: [String] {
         storeDetail?.storeImageUrls ?? []
     }
+    
+    var ownerInfo: (String?, String?) {
+        (storeDetail?.creator.nick, storeDetail?.creator.userID)
+    }
 }
+
 

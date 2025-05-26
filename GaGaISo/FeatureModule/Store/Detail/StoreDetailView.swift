@@ -14,6 +14,7 @@ struct StoreDetailView: View {
     
     @State private var currentImageIndex = 0
     @State private var selectedMenuCategory = "전체"
+    @State private var showChatView = false
     
     init(viewModel: StoreDetailViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -168,12 +169,16 @@ struct StoreDetailView: View {
             // 가게 상세 정보
             storeDetailInfo
                 .padding(.horizontal)
-                .padding(.bottom)
+                .padding(.bottom, 8)
             
             // 예상 소요시간
             estimatedTimeSection
                 .padding(.horizontal)
-                .padding(.bottom)
+                .padding(.bottom, 8)
+            
+            ownerInfo
+                .padding(.horizontal)
+                .padding(.bottom, 8)
             
             Divider().background(.brightSprout)
             
@@ -250,7 +255,7 @@ struct StoreDetailView: View {
                     .pretendardFont(size: .body2)
                     .foregroundColor(.gray60)
                     .padding(.trailing, 8)
-                    
+                
                 
                 Image(systemName: "mappin.and.ellipse")
                     .foregroundColor(.deepSprout)
@@ -296,8 +301,8 @@ struct StoreDetailView: View {
             .padding(.bottom, 4)
         }
         .padding(10)
-        .cornerRadius(15)
         .background(.gray0)
+        .cornerRadius(15)
         .overlay(
             RoundedRectangle(cornerRadius: 15)
                 .stroke(.gray60, lineWidth: 1)
@@ -319,20 +324,56 @@ struct StoreDetailView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 6)
-        .cornerRadius(15)
         .background(.gray0)
+        .cornerRadius(15)
         .overlay(
             RoundedRectangle(cornerRadius: 15)
                 .stroke(.gray60, lineWidth: 1)
         )
     }
     
+    private var ownerInfo: some View {
+        HStack {
+            Image(systemName: "figure.stand.line.dotted.figure.stand")
+                .foregroundColor(.blackSprout)
+                .font(.title3)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                Text(viewModel.ownerInfo.0 ?? "")
+                    .pretendardFont(size: .body2, weight: .bold)
+                    .foregroundColor(.gray90)
+            }
+            
+            Spacer()
+            
+            Button {
+                showChatView = true
+            } label: {
+                Text("싸장님과 채팅하기")
+                    .pretendardFont(size: .body3, weight: .medium)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(.blackSprout)
+                    .cornerRadius(12)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(.gray0)
+        .cornerRadius(15)
+        .overlay(
+            RoundedRectangle(cornerRadius: 15)
+                .stroke(.gray60, lineWidth: 1)
+        )
+    }
+    
+    
     // MARK: - 메뉴 섹션
     private var menuSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // 메뉴 필터
             menuFilterSection
-            // 메뉴 목록
+            
             menuListSection
                 .padding(.horizontal)
         }
@@ -373,7 +414,7 @@ struct StoreDetailView: View {
                 } label: {
                     MenuItemView(viewModel: diContainer.getMenuItemViewModel(menu: menu))
                 }
-
+                
                 Divider()
             }
         }
