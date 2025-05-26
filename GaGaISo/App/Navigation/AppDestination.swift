@@ -11,20 +11,20 @@ enum AppDestination: Hashable {
     case home
     case storeDetail(storeId: String)
     case orderStatus(orderId: String)
-    case orderHistory
+    case memuDetail(menu: MenuList)
     case profile
     case notifications
 
     var targetTab: AppTab {
         switch self {
-        case .home, .storeDetail:
+        case .home, .storeDetail, .memuDetail:
             return .home
-        case .orderStatus, .orderHistory:
+        case .orderStatus:
             return .orders
         case .profile:
             return .profile
         case .notifications:
-            return .notifications
+            return .community
         }
     }
 }

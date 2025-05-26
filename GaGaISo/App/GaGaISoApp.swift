@@ -15,6 +15,8 @@ struct GaGaISoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     let diContainer = DIContainer()
     
+    @StateObject private var navigationManager = AppNavigationManager.shared
+    
     //testMode
     var forceLoginProcess = true
     
@@ -45,9 +47,20 @@ struct GaGaISoApp: App {
                 .onOpenURL(perform: { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
                         _ = AuthController.handleOpenUrl(url: url)
+                    }else {
+                        handleDeepLink(url: url)
                     }
                 })
                 .installToast(position: .bottom)
         }
     }
+    
+    private func handleDeepLink(url: URL) {
+        if diContainer.authManager.isLoggedIn {
+            // 로그인된 상태면 메인 앱 네비게이터로 처리
+            navigationManager.handleDeepLink(url: url)
+            } else {
+                navigationManager.pendingDeepLink = url
+            }
+        }
 }

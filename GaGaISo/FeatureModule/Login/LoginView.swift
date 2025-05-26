@@ -9,10 +9,11 @@ import SwiftUI
 import Toasts
 
 struct LoginView: View {
-    @Environment(\.presentToast) var presentToast
-    @Environment(\.diContainer) var diContainer
+    @Environment(\.presentToast) private var presentToast
+    @Environment(\.diContainer) private var diContainer
+    @StateObject private var navigationManager = AppNavigationManager.shared
     
-    @StateObject var viewModel: LoginViewModel
+    @StateObject private var viewModel: LoginViewModel
     
     init(viewModel: LoginViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -81,6 +82,7 @@ struct LoginView: View {
             
             Button(action: {
                 viewModel.loginButtonTapped()
+                navigationManager.processPendingDeepLink()
             }) {
                 Text("로그인")
                     .fontWeight(.bold)
@@ -163,11 +165,5 @@ struct LoginView: View {
                 presentToast(toast)
             }
         }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        
     }
 }

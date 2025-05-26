@@ -52,7 +52,7 @@ struct Creator: Codable {
     }
 }
 
-struct MenuList: Decodable {
+struct MenuList: Decodable, Hashable {
     let menuID, storeID, category, name: String
     let description, originInformation: String
     let price: Int

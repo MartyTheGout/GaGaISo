@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PopularStoreView: View {
     @Environment(\.diContainer) private var diContainer
+    @StateObject private var navigationManager = AppNavigationManager.shared
     
     @StateObject private var viewModel: PopularStoreViewModel
     
@@ -29,7 +30,7 @@ struct PopularStoreView: View {
                 }
             }
             .padding(.horizontal)
-        
+            
             HStack {
                 Text("실시간 가가이소 맛집")
                     .pretendardFont(size: .body2, weight: .bold)
@@ -46,13 +47,14 @@ struct PopularStoreView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
                         ForEach(viewModel.storeIds, id: \.self) { storeId in
-                            NavigationLink {
-                                StoreDetailView(viewModel: diContainer.getStoreDetailViewModel(storeId: storeId))
-                            } label: {
+                            Button(action: {
+                                navigationManager.navigate(to: .storeDetail(storeId: storeId))
+                            }) {
                                 TrendingStoreCard(
                                     viewModel: diContainer.getTrendingStoreCardViewModel(storeId: storeId)
                                 )
                             }
+                            .buttonStyle(PlainButtonStyle())
                         }
                     }
                     .padding(.horizontal)

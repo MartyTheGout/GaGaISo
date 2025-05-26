@@ -8,6 +8,8 @@ import SwiftUI
 
 struct StoreListView: View {
     @Environment(\.diContainer) private var diContainer
+    @StateObject private var navigationManager = AppNavigationManager.shared
+    
     @StateObject var viewModel : StoreListViewModel
     
     init(viewModel: StoreListViewModel) {
@@ -19,7 +21,13 @@ struct StoreListView: View {
             FavoriteStoresSection(currentTab: $viewModel.currentTab)
             
             ForEach(viewModel.storeIds, id: \.self) { storeId in
-                StoreCard(viewModel: diContainer.getStoreItemViewModel(storeId: storeId))
+                Button(action: {
+                    navigationManager.navigate(to: .storeDetail(storeId: storeId))
+                }) {
+                    StoreCard(viewModel: diContainer.getStoreItemViewModel(storeId: storeId))
+                }
+                .buttonStyle(PlainButtonStyle())
+                
                 Divider().padding(4)
             }
         }
