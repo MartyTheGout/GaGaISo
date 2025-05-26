@@ -27,7 +27,7 @@ enum AppTab: Int, CaseIterable {
         case .home: return "house.fill"
         case .orders: return "list.bullet"
         case .community: return "person.3.fill"
-        case .profile: return "person.3.fill"
+        case .profile: return "person.fill"
         }
     }
 }
