@@ -125,4 +125,8 @@ final class StrategicNetworkHandler {
         // Convert to nanoseconds
         return UInt64(finalDelaySeconds * 1_000_000_000)
     }
+    
+    func getAccessToken() -> String? {
+        authManager.getAccessToken()
+    }
 }

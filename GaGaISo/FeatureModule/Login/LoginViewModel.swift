@@ -10,8 +10,8 @@ import Combine
 import AuthenticationServices
 
 class LoginViewModel: ObservableObject {
-    @Published var email: String = ""
-    @Published var password: String = ""
+    @Published var email: String = "chichi@gmail.com"
+    @Published var password: String = "asdf1234!"
     @Published var isShowingSignUp = false
     @Published var isLoading = false
     @Published var errorMessage: String?

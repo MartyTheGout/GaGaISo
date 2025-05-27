@@ -12,9 +12,11 @@ import SwiftUI
 
 class StoreDetailViewModel: ObservableObject {
     let storeId: String
-
+    
     private let storeService: StoreService
     private let imageService: ImageService
+    private let chatContext: ChatContext
+
     private var cancellables = Set<AnyCancellable>()
     
     @Published var storeImages: [UIImage] = []
@@ -23,16 +25,21 @@ class StoreDetailViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
+    @Published var showChatRoom: Bool = false
+    @Published var chatRoomId: String?
+    @Published var isChatLoading: Bool = false
+    
     var storeDetail: StoreDetailDTO? {
         didSet {
             self.loadStoreImagesIfNeeded()
         }
     }
     
-    init(storeId: String, storeService: StoreService, imageService: ImageService) {
+    init(storeId: String, storeService: StoreService, imageService: ImageService, chatContext: ChatContext) {
         self.storeId = storeId
         self.storeService = storeService
         self.imageService = imageService
+        self.chatContext = chatContext
     }
     
     func loadStoreDetail() async {
@@ -100,6 +107,36 @@ class StoreDetailViewModel: ObservableObject {
         case .failure(let error):
             storeDetail.isPick.toggle()
             errorMessage = error.localizedDescription
+        }
+    }
+    
+    func startChatWithOwner() {
+        guard let ownerId = storeDetail?.creator.userID else {
+            errorMessage = "사장님 정보를 찾을 수 없습니다."
+            return
+        }
+        
+        Task {
+            await MainActor.run {
+                isChatLoading = true
+                errorMessage = nil
+            }
+            print("ownerId sent: \(ownerId)")
+            
+            if let chatRoom = await chatContext.createOrGetChatRoom(with: ownerId) {
+                print("chatRoomnumber came: \(chatRoom)")
+                
+                await MainActor.run {
+                    self.chatRoomId = chatRoom.id
+                    self.showChatRoom = true
+                    self.isChatLoading = false
+                }
+            } else {
+                await MainActor.run {
+                    self.errorMessage = "채팅방 생성에 실패했습니다."
+                    self.isChatLoading = false
+                }
+            }
         }
     }
 }

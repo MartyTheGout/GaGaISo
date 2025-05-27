@@ -21,12 +21,12 @@ class ChatRoomViewModel: ObservableObject {
         self.roomId = roomId
         self.chatContext = chatContext
         setupObservers()
+        print("ChatRoomViewModelInit")
     }
     
     private func setupObservers() {
         chatContext.$currentMessages
             .sink { [weak self] messages in
-                // 새 메시지가 추가되면 스크롤을 맨 아래로
                 if !messages.isEmpty {
                     self?.shouldScrollToBottom = true
                 }

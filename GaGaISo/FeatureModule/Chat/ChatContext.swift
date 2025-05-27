@@ -11,10 +11,8 @@ import RealmSwift
 
 class ChatContext: ObservableObject {
     private let chatService: ChatService
-    private let realm: Realm
     private var cancellables = Set<AnyCancellable>()
     
-    // Published properties
     @Published private(set) var chatRooms: [ChatRoom] = []
     @Published private(set) var currentMessages: [ChatMessage] = []
     @Published private(set) var currentRoomId: String?
@@ -23,13 +21,11 @@ class ChatContext: ObservableObject {
     @Published private(set) var connectionStatus: SocketConnectionStatus = .disconnected
     @Published var errorMessage: String?
     
-    // Realm 관찰자들
     private var roomsToken: NotificationToken?
     private var messagesToken: NotificationToken?
     
     init(chatService: ChatService) {
         self.chatService = chatService
-        self.realm = try! Realm()
         
         setupRealmObservers()
         setupServiceObservers()
@@ -43,7 +39,8 @@ class ChatContext: ObservableObject {
     
     // MARK: - Setup
     private func setupRealmObservers() {
-        // 채팅방 목록 관찰
+        let realm = try! Realm()
+        
         let realmRooms = realm.objects(RealmChatRoom.self).sorted(byKeyPath: "updatedAt", ascending: false)
         
         roomsToken = realmRooms.observe { [weak self] changes in
@@ -61,11 +58,9 @@ class ChatContext: ObservableObject {
     }
     
     private func setupServiceObservers() {
-        // Socket 연결 상태
         chatService.$connectionStatus
             .assign(to: &$connectionStatus)
         
-        // 새 메시지 수신
         chatService.$newMessage
             .compactMap { $0 }
             .sink { [weak self] message in
@@ -89,6 +84,7 @@ class ChatContext: ObservableObject {
             return room
         case .failure(let error):
             await MainActor.run {
+                print(#function)
                 errorMessage = error.localizedDescription
             }
             return nil
@@ -138,6 +134,8 @@ class ChatContext: ObservableObject {
     
     // MARK: - Private Methods
     private func observeMessages(for roomId: String) {
+        let realm = try! Realm()
+        
         let realmMessages = realm.objects(RealmChatMessage.self)
             .filter("roomId == %@", roomId)
             .sorted(byKeyPath: "createdAt", ascending: true)
@@ -186,6 +184,8 @@ class ChatContext: ObservableObject {
     
     // MARK: - Realm Operations
     private func saveChatRoom(_ room: ChatRoom) {
+        let realm = try! Realm()
+        
         try! realm.write {
             let realmRoom = RealmChatRoom()
             realmRoom.id = room.id
@@ -209,6 +209,8 @@ class ChatContext: ObservableObject {
     }
     
     private func saveMessage(_ message: ChatMessage) {
+        let realm = try! Realm()
+        
         try! realm.write {
             let realmMessage = RealmChatMessage()
             realmMessage.id = message.id
@@ -237,6 +239,8 @@ class ChatContext: ObservableObject {
     }
     
     private func markMessagesAsRead(in roomId: String) {
+        let realm = try! Realm()
+        
         try! realm.write {
             let unreadMessages = realm.objects(RealmChatMessage.self)
                 .filter("roomId == %@ AND isRead == false AND senderId != %@", roomId, getCurrentUserId())
@@ -253,6 +257,8 @@ class ChatContext: ObservableObject {
     }
     
     private func incrementUnreadCount(for roomId: String) {
+        let realm = try! Realm()
+        
         try! realm.write {
             if let room = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: roomId) {
                 room.unreadCount += 1
@@ -261,6 +267,8 @@ class ChatContext: ObservableObject {
     }
     
     private func updateTotalUnreadCount() {
+        let realm = try! Realm()
+        
         let total: Int = realm.objects(RealmChatRoom.self).sum(ofProperty: "unreadCount")
         DispatchQueue.main.async {
             self.totalUnreadCount = total
@@ -343,8 +351,9 @@ extension ChatContext {
         }
     }
     
-    func deleteChatRoom(_ roomId: String) async {
+    func deleteChatRoom(_ roomId: String) {
         // 실제 서버 API 호출이 필요하면 여기에 추가
+        let realm = try! Realm()
         
         // 로컬에서만 삭제하는 경우
         try! realm.write {

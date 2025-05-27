@@ -17,7 +17,6 @@ struct ChatRoomView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // 메시지 목록
             ScrollViewReader { proxy in
                 ScrollView {
                     LazyVStack(spacing: 8) {
@@ -29,7 +28,7 @@ struct ChatRoomView: View {
                     .padding(.horizontal)
                     .padding(.top, 8)
                 }
-                .onChange(of: viewModel.shouldScrollToBottom) { shouldScroll in
+                .onChange(of: viewModel.shouldScrollToBottom, initial: false) { _, shouldScroll in
                     if shouldScroll, let lastMessage = viewModel.messages.last {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             proxy.scrollTo(lastMessage.id, anchor: .bottom)
@@ -44,7 +43,6 @@ struct ChatRoomView: View {
                 }
             }
             
-            // 메시지 입력창
             messageInputView
         }
         .navigationTitle(viewModel.otherParticipantName)

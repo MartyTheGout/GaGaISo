@@ -5,8 +5,6 @@
 //  Created by marty.academy on 5/27/25.
 //
 
-import Foundation
-
 // MARK: - Realm Models
 import Foundation
 import SocketIO
@@ -63,21 +61,47 @@ class ChatService: ObservableObject {
     }
     
     private func setupSocket() {
-        guard let url = URL(string: "wss://your-server.com") else { return }
+        guard let url = URL(string: ExternalDatasource.pickup.baseURLString) else { return }
         
         manager = SocketManager(socketURL: url, config: [
-            .extraHeaders(["Authorization": "Bearer \(getAccessToken())"])
+            .extraHeaders(
+                [
+                    "Authorization": "\(networkManager.getAccessToken())",
+                    "SeSACKey": APIKey.PICKUP
+                ]
+            )
         ])
         
         socket = manager?.defaultSocket
         
+        // 연결 상태 모니터링
+        socket?.on(clientEvent: .connect) { [weak self] _, _ in
+            DispatchQueue.main.async {
+                self?.connectionStatus = .connected
+            }
+        }
+        
+        socket?.on(clientEvent: .disconnect) { [weak self] _, _ in
+            DispatchQueue.main.async {
+                self?.connectionStatus = .disconnected
+            }
+        }
+        
+        socket?.on(clientEvent: .error) { [weak self] data, _ in
+            DispatchQueue.main.async {
+                self?.connectionStatus = .error(data.first as? String ?? "Unknown error")
+            }
+        }
+        
         socket?.on("new_message") { [weak self] data, _ in
-            // Socket 메시지 파싱 로직
+            dump(data)
+//            DispatchQueue.main.async {
+//                self?.newMessage = data.first as? String?
+//            }
         }
     }
     
     private func mapToChatRoom(from dto: ChatRoomDTO) -> ChatRoom {
-        // DTO → ChatRoom 변환 로직
         return ChatRoom(id: dto.roomId, participants: dto.participants, lastMessage: nil, unreadCount: 0, createdAt: Date(), updatedAt: Date())
     }
     
@@ -97,10 +121,6 @@ class ChatService: ObservableObject {
             isRead: false,
             isSent: true
         )
-    }
-    
-    private func getAccessToken() -> String {
-        return ""
     }
 }
 

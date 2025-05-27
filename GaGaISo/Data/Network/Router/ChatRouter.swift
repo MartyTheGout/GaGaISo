@@ -56,9 +56,7 @@ enum ChatRouter: RouterProtocol {
         case .v1SendMessage(_, let message, let fileURL):
             let dict = [
                 "content": message,
-                "files": [
-                    fileURL
-                ]
+                "files": fileURL ?? []
             ] as [String : Any]
             return try? JSONSerialization.data(withJSONObject: dict)
             

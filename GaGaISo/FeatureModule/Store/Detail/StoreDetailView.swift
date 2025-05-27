@@ -14,7 +14,6 @@ struct StoreDetailView: View {
     
     @State private var currentImageIndex = 0
     @State private var selectedMenuCategory = "전체"
-    @State private var showChatView = false
     
     init(viewModel: StoreDetailViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -72,6 +71,16 @@ struct StoreDetailView: View {
         .onAppear {
             Task {
                 await viewModel.loadStoreDetail()
+            }
+        }
+        .sheet(isPresented: $viewModel.showChatRoom) {
+            if let roomId = viewModel.chatRoomId {
+                ChatRoomView(
+                    viewModel: diContainer.getChatRoomViewModel(roomId: roomId)
+                )
+            } else {
+                ProgressView("채팅방을 준비하는 중...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
     }
@@ -161,17 +170,14 @@ struct StoreDetailView: View {
     // MARK: - 가게 정보 섹션
     private var storeInfoSection: some View {
         VStack(alignment: .leading) {
-            // 가게 기본 정보
             storeBasicInfo
                 .padding(.horizontal)
                 .padding(.bottom)
             
-            // 가게 상세 정보
             storeDetailInfo
                 .padding(.horizontal)
                 .padding(.bottom, 8)
             
-            // 예상 소요시간
             estimatedTimeSection
                 .padding(.horizontal)
                 .padding(.bottom, 8)
@@ -182,7 +188,7 @@ struct StoreDetailView: View {
             
             Divider().background(.brightSprout)
             
-            // 메뉴 필터 및 목록
+            
             menuSection
                 .background(.gray0)
         }
@@ -347,7 +353,7 @@ struct StoreDetailView: View {
             Spacer()
             
             Button {
-                showChatView = true
+                viewModel.startChatWithOwner()
             } label: {
                 Text("싸장님과 채팅하기")
                     .pretendardFont(size: .body3, weight: .medium)
