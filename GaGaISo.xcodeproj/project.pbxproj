@@ -15,6 +15,7 @@
 		40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */ = {isa = PBXBuildFile; productRef = 40C05A5D2DD9CFD60012671F /* Toasts */; };
 		40D86F852DE4984000BF4D00 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 40D86F842DE4984000BF4D00 /* SocketIO */; };
 		40D870762DE4B2BE00BF4D00 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 40D870752DE4B2BE00BF4D00 /* RealmSwift */; };
+		40D871F82DE5CF6000BF4D00 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 40D870752DE4B2BE00BF4D00 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,6 +27,20 @@
 			remoteInfo = GaGaISo;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		40D871F92DE5CF6000BF4D00 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				40D871F82DE5CF6000BF4D00 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		407D26712DD32AE90043F141 /* GaGaISo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GaGaISo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -141,6 +156,7 @@
 				407D266D2DD32AE90043F141 /* Sources */,
 				407D266E2DD32AE90043F141 /* Frameworks */,
 				407D266F2DD32AE90043F141 /* Resources */,
+				40D871F92DE5CF6000BF4D00 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
