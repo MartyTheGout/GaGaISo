@@ -17,30 +17,31 @@ class ChatService: ObservableObject {
     @Published var newMessage: ChatMessage?
     @Published var connectionStatus: SocketConnectionStatus = .disconnected
     
+    
     init(networkManager: StrategicNetworkHandler) {
         self.networkManager = networkManager
         setupSocket()
     }
     
-    func createOrGetChatRoom(with userId: String) async -> Result<ChatRoom, Error> {
+    func createOrGetChatRoom(with userId: String) async -> Result<ChatRoom, APIError> {
         let result = await networkManager.request(ChatRouter.v1CreateChat(opponent: userId), type: ChatRoomDTO.self)
         
-        return result.map { mapToChatRoom(from: $0) }.mapError { $0 as Error}
+        return result.map { mapToChatRoom(from: $0) }
     }
     
-    func getChatRooms() async -> Result<[ChatRoom], Error> {
+    func getChatRooms() async -> Result<[ChatRoom], APIError> {
         let result = await networkManager.request(
             ChatRouter.v1ListChat,
             type: ChatRoomListDTO.self
         )
-        return result.map { $0.data.map { mapToChatRoom(from: $0) } }.mapError{ $0 as Error}
+        return result.map { $0.data.map { mapToChatRoom(from: $0) } }
     }
     
-    func sendMessage(roomId: String, content: String, files: [String]?) async -> Result<ChatMessage, Error> {
+    func sendMessage(roomId: String, content: String, files: [String]?) async -> Result<ChatMessage, APIError> {
         
         let result = await networkManager.request(ChatRouter.v1SendMessage(roomId: roomId, message: content, fileURL: files ?? []), type: LastChatDTO.self)
         
-        return result.map { mapToChatMessage(from: $0) }.mapError{ $0 as Error}
+        return result.map { mapToChatMessage(from: $0) }
     }
     
     // Socket 관련

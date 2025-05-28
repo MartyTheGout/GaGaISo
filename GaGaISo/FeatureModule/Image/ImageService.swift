@@ -15,14 +15,14 @@ class ImageService {
         self.networkManager = networkManager
     }
     
-    func fetchImageWith(urlString: String) async -> Result<UIImage?, Error> {
+    func fetchImageWith(urlString: String) async -> Result<UIImage?, APIError> {
         let result = await networkManager.request(ImageRouter.v1GetImage(resourcePath: urlString), type: Data.self)
         
         return result.map {
             guard let image = UIImage(data: $0) else { return nil }
             return downsizeImage(image, targetSize: CGSize(width: 250, height: 200))
             
-        }.mapError { $0 as Error }
+        }
     }
     
     private func downsizeImage(_ image: UIImage, targetSize: CGSize) -> UIImage {
@@ -43,7 +43,7 @@ class ImageService {
 
 
 class MockImageService: ImageService {
-    override func fetchImageWith(urlString: String) async -> Result<UIImage?, Error> {
+    override func fetchImageWith(urlString: String) async -> Result<UIImage?, APIError> {
         // Mock 이미지 생성 (실제로는 네트워크에서 가져올 이미지)
         try? await Task.sleep(nanoseconds: 500_000_000) // 0.5초 지연
         
@@ -69,6 +69,6 @@ class MockImageService: ImageService {
             return .success(renderedImage)
         }
         
-        return .failure(NSError(domain: "MockImageService", code: 404, userInfo: [NSLocalizedDescriptionKey: "Image not found"]))
+        return .failure(APIError.unknown(NSError()))
     }
 }
