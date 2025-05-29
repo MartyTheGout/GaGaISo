@@ -39,6 +39,8 @@ class ChatService: ObservableObject {
     
     func sendMessage(roomId: String, content: String, files: [String]?) async -> Result<ChatMessage, APIError> {
         
+        socket?.emit("message", content)
+        
         let result = await networkManager.request(ChatRouter.v1SendMessage(roomId: roomId, message: content, fileURL: files ?? []), type: LastChatDTO.self)
         
         return result.map { mapToChatMessage(from: $0) }
@@ -78,6 +80,7 @@ class ChatService: ObservableObject {
         // 연결 상태 모니터링
         socket?.on(clientEvent: .connect) { [weak self] _, _ in
             DispatchQueue.main.async {
+                print("socket connection created")
                 self?.connectionStatus = .connected
             }
         }
@@ -94,7 +97,7 @@ class ChatService: ObservableObject {
             }
         }
         
-        socket?.on("new_message") { [weak self] data, _ in
+        socket?.on("message") { [weak self] data, _ in
             dump(data)
 //            DispatchQueue.main.async {
 //                self?.newMessage = data.first as? String?

@@ -29,6 +29,7 @@ final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
     func tryRefreshIfNeeded() async -> Bool {
         guard let accessToken = authStore.accessToken,
               let refreshToken = authStore.refreshToken else {
+            print("no accessToken, or no refresh Token ")
             return false
         }
         let request = AuthenticationRouter.v1AuthRefresh(accessToken: accessToken, refreshToken: refreshToken).createRequest(withToken: accessToken)

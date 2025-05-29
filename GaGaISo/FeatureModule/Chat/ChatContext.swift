@@ -85,14 +85,14 @@ class ChatContext: ObservableObject {
         case .failure(let error):
             await MainActor.run {
                 print(#function)
-                errorMessage = error.localizedDescription
+                errorMessage = error.localizedDescription + "\(#function)"
             }
             return nil
         }
     }
     
     @MainActor
-    func enterChatRoom(_ roomId: String) async {
+    func enterChatRoom(_ roomId: String) async { // socket 시작은 여기서부터
         currentRoomId = roomId
         
         // 메시지 관찰 시작
@@ -156,13 +156,9 @@ class ChatContext: ObservableObject {
         }
     }
     
+    //Currently only handle new message from the existing socket connection
     private func handleNewMessage(_ message: ChatMessage) {
         saveMessage(message)
-        
-        // 현재 방이 아니면 미읽음 처리
-        if message.roomId != currentRoomId {
-            incrementUnreadCount(for: message.roomId)
-        }
     }
     
     private func loadChatRooms() {
@@ -176,15 +172,30 @@ class ChatContext: ObservableObject {
                 }
             case .failure(let error):
                 await MainActor.run {
-                    errorMessage = error.localizedDescription
+                    errorMessage = error.localizedDescription + "\(#function)"
                 }
             }
         }
     }
     
     // MARK: - Realm Operations
+    // Save loaded ChatRoom when realm has no updated data. different updated data.
     private func saveChatRoom(_ room: ChatRoom) {
         let realm = try! Realm()
+        
+        let realmRoom = realm.objects(RealmChatRoom.self).where { $0.id == room.id }.first
+        
+        // Update Condition: 1) There is no same data on Realm, 2) There is different lastMessage.id
+        let shouldUpdate: Bool
+        if let existingRoom = realmRoom {
+            shouldUpdate = existingRoom.lastMessageId != (room.lastMessage?.id ?? "")
+        } else {
+            shouldUpdate = true
+        }
+        
+        guard shouldUpdate else {
+            return
+        }
         
         try! realm.write {
             let realmRoom = RealmChatRoom()
@@ -205,36 +216,51 @@ class ChatContext: ObservableObject {
             realmRoom.updatedAt = room.updatedAt
             
             realm.add(realmRoom, update: .modified)
+            
+            if let lastMessage = room.lastMessage {
+                saveMessageOnly(lastMessage, in: realm)
+            }
         }
     }
     
-    private func saveMessage(_ message: ChatMessage) {
+    // saveMessageOnly is required when chatRoomUpdate happens firstly.
+    // But when just message updated, corresponding chat room update is also required.
+    private func saveMessageOnly(_ message: ChatMessage, in realm: Realm) {
+        let realmMessage = RealmChatMessage()
+        realmMessage.id = message.id
+        realmMessage.roomId = message.roomId
+        realmMessage.content = message.content
+        realmMessage.senderId = message.senderId
+        realmMessage.senderNick = message.senderNick
+        realmMessage.senderProfileImage = message.senderProfileImage ?? ""
+        
+        if let files = message.files {
+            realmMessage.files.append(objectsIn: files)
+        }
+        
+        realmMessage.createdAt = message.createdAt
+        realmMessage.isRead = message.isRead
+        realmMessage.isSent = message.isSent
+        
+        realm.add(realmMessage, update: .modified)
+    }
+    
+    private func saveMessage(_ message: ChatMessage, shouldUpdateRoom: Bool = true) {
         let realm = try! Realm()
         
         try! realm.write {
-            let realmMessage = RealmChatMessage()
-            realmMessage.id = message.id
-            realmMessage.roomId = message.roomId
-            realmMessage.content = message.content
-            realmMessage.senderId = message.senderId
-            realmMessage.senderNick = message.senderNick
-            realmMessage.senderProfileImage = message.senderProfileImage ?? ""
+            saveMessageOnly(message, in: realm)
             
-            if let files = message.files {
-                realmMessage.files.append(objectsIn: files)
+            if shouldUpdateRoom {
+                updateChatRoomLastMessage(roomId: message.roomId, messageId: message.id, updatedAt: message.createdAt, in: realm)
             }
-            
-            realmMessage.createdAt = message.createdAt
-            realmMessage.isRead = message.isRead
-            realmMessage.isSent = message.isSent
-            
-            realm.add(realmMessage, update: .modified)
-            
-            // 채팅방의 마지막 메시지도 업데이트
-            if let room = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: message.roomId) {
-                room.lastMessageId = message.id
-                room.updatedAt = message.createdAt
-            }
+        }
+    }
+    
+    private func updateChatRoomLastMessage(roomId: String, messageId: String, updatedAt: Date, in realm: Realm) {
+        if let room = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: roomId) {
+            room.lastMessageId = messageId
+            room.updatedAt = updatedAt
         }
     }
     
@@ -249,7 +275,6 @@ class ChatContext: ObservableObject {
                 message.isRead = true
             }
             
-            // 채팅방 미읽음 개수 초기화
             if let room = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: roomId) {
                 room.unreadCount = 0
             }
@@ -320,7 +345,7 @@ class ChatContext: ObservableObject {
     func connectSocket() {
         chatService.connectSocket()
     }
-
+    
     func disconnectSocket() {
         chatService.disconnectSocket()
     }
@@ -345,20 +370,17 @@ extension ChatContext {
                     saveChatRoom(room)
                 }
             case .failure(let error):
-                errorMessage = error.localizedDescription
+                errorMessage = error.localizedDescription + "\(#function)"
             }
             isLoading = false
         }
     }
     
     func deleteChatRoom(_ roomId: String) {
-        // 실제 서버 API 호출이 필요하면 여기에 추가
         let realm = try! Realm()
         
-        // 로컬에서만 삭제하는 경우
         try! realm.write {
             if let roomToDelete = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: roomId) {
-                // 해당 방의 모든 메시지도 삭제
                 let messagesToDelete = realm.objects(RealmChatMessage.self).filter("roomId == %@", roomId)
                 realm.delete(messagesToDelete)
                 realm.delete(roomToDelete)
