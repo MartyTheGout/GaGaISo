@@ -18,7 +18,7 @@ struct GaGaISoApp: App {
     @StateObject private var navigationManager = AppNavigationManager.shared
     
     //testMode
-    var forceLoginProcess = true
+    var forceLoginProcess = false
     
     init() {
         let authStore = diContainer.authStore
