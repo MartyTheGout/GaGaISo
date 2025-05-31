@@ -44,10 +44,8 @@ class ImageService {
 
 class MockImageService: ImageService {
     override func fetchImageWith(urlString: String) async -> Result<UIImage?, APIError> {
-        // Mock 이미지 생성 (실제로는 네트워크에서 가져올 이미지)
         try? await Task.sleep(nanoseconds: 500_000_000) // 0.5초 지연
         
-        // 시스템 이미지를 사용한 Mock UIImage 생성
         let systemImageName: String
         switch urlString {
         case let url where url.contains("menu"):
@@ -57,7 +55,6 @@ class MockImageService: ImageService {
         }
         
         if let image = UIImage(systemName: systemImageName) {
-            // 시스템 이미지를 실제 이미지처럼 보이게 하기 위해 렌더링
             let renderer = UIGraphicsImageRenderer(size: CGSize(width: 300, height: 200))
             let renderedImage = renderer.image { context in
                 UIColor.systemGray3.setFill()
