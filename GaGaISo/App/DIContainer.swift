@@ -31,6 +31,9 @@ class DIContainer: ObservableObject {
     let chatContext: ChatContext
     let chatService: ChatService
     
+    let communityService: CommunityService
+    let communityContext: CommunityContext
+    
     init(
         authStore: AuthStore = AuthStore(),
         networkClient: RawNetworkClient = RawNetworkClient(),
@@ -57,6 +60,9 @@ class DIContainer: ObservableObject {
         
         self.chatService = ChatService(networkManager: networkManager)
         self.chatContext = ChatContext(chatService: chatService)
+        
+        self.communityService = CommunityService(networkManager: networkManager)
+        self.communityContext = CommunityContext(communityService: communityService, locationManager: locationManager)
     }
     
     func getEntryViewModel() -> AppEntryViewModel {
@@ -128,5 +134,13 @@ class DIContainer: ObservableObject {
     
     func getChatRoomViewModel(roomId: String) -> ChatRoomViewModel {
         ChatRoomViewModel(roomId: roomId, chatContext: chatContext)
+    }
+    
+    func getCommunityViewModel() -> CommunityViewModel {
+        CommunityViewModel(communityContext: communityContext)
+    }
+    
+    func getPostItemViewModel(postId: String) -> PostItemViewModel {
+        PostItemViewModel(postId: postId, communityContext: communityContext, imageService: imageService, locationManager: locationManager)
     }
 }

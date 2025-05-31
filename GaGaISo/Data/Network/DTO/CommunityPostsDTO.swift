@@ -24,8 +24,8 @@ struct PostDTO: Codable {
     let geolocation: Geolocation
     let creator: Creator
     let files: [String]
-    let isLike: Bool
-    let likeCount: Int
+    var isLike: Bool
+    var likeCount: Int
     let createdAt, updatedAt: String
 
     enum CodingKeys: String, CodingKey {

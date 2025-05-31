@@ -38,7 +38,7 @@ struct ContentView: View {
             .tag(AppTab.orders)
             
             NavigationStack(path: $navigationManager.communityNavigationPath) {
-                FavoritesView()
+                CommunityView(viewModel: diContainer.getCommunityViewModel())
                     .navigationDestination(for: AppDestination.self) { destination in
                         destinationView(for: destination)
                     }
