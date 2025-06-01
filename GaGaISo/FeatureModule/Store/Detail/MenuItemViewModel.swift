@@ -13,7 +13,7 @@ class MenuItemViewModel: ObservableObject {
     
     let menuId: String
     
-    private let imageService: ImageService
+    private let imageContext: ImageContext
     private var cancellables = Set<AnyCancellable>()
     
     @Published var menuImage: UIImage?
@@ -22,10 +22,10 @@ class MenuItemViewModel: ObservableObject {
     
     private let menu: MenuList
     
-    init(menu: MenuList, imageService: ImageService) {
+    init(menu: MenuList, imageContext: ImageContext) {
         self.menuId = menu.menuID
         self.menu = menu
-        self.imageService = imageService
+        self.imageContext = imageContext
     }
     
     func loadMenuImage() {
@@ -39,7 +39,7 @@ class MenuItemViewModel: ObservableObject {
         imageLoadError = nil
         
         Task {
-            let result = await imageService.fetchImageWith(urlString: urlString)
+            let result = await imageContext.fetchImageWith(urlString: urlString)
             
             await MainActor.run {
                 switch result {

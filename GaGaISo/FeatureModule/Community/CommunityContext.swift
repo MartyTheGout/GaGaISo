@@ -10,18 +10,8 @@ import Combine
 
 class CommunityContext: ObservableObject {
     // Output
-    @Published private(set) var posts: [String: PostDTO] = [:] {
-        didSet {
-            print("CommunityContext updated")
-            dump(posts)
-        }
-    }
-    @Published private(set) var currentPostIds: [String] = [] {
-        didSet {
-            print("CommunityContext updated")
-            dump(currentPostIds)
-        }
-    }
+    @Published private(set) var posts: [String: PostDTO] = [:]
+    @Published private(set) var currentPostIds: [String] = [] 
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var nextCursor = ""

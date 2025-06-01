@@ -12,16 +12,16 @@ import Combine
 class MenuDetailViewModel: ObservableObject {
     let menu: MenuList
     
-    private let imageService: ImageService
+    private let imageContext: ImageContext
     private let orderContext: OrderContext
     
     @Published var menuImage: UIImage?
     @Published var isImageLoading: Bool = false
     @Published var quantity: Int = 1
     
-    init(menu: MenuList, imageService: ImageService, orderContext: OrderContext) {
+    init(menu: MenuList, imageContext: ImageContext, orderContext: OrderContext) {
         self.menu = menu
-        self.imageService = imageService
+        self.imageContext = imageContext
         self.orderContext = orderContext
     }
     
@@ -31,7 +31,7 @@ class MenuDetailViewModel: ObservableObject {
         isImageLoading = true
         
         Task {
-            let result = await imageService.fetchImageWith(urlString: menu.menuImageURL)
+            let result = await imageContext.fetchImageWith(urlString: menu.menuImageURL)
             
             await MainActor.run {
                 switch result {

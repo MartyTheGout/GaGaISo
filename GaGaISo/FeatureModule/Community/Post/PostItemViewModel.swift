@@ -15,7 +15,7 @@ class PostItemViewModel: ObservableObject {
     let postId: String
     
     private let communityContext: CommunityContext
-    private let imageService: ImageService
+    private let imageContext: ImageContext
     private let locationManager: LocationManager
     private var cancellables = Set<AnyCancellable>()
     
@@ -27,10 +27,10 @@ class PostItemViewModel: ObservableObject {
         communityContext.post(for: postId)
     }
     
-    init(postId: String, communityContext: CommunityContext, imageService: ImageService, locationManager: LocationManager) {
+    init(postId: String, communityContext: CommunityContext, imageContext: ImageContext, locationManager: LocationManager) {
         self.postId = postId
         self.communityContext = communityContext
-        self.imageService = imageService
+        self.imageContext = imageContext
         self.locationManager = locationManager
         
         communityContext.$posts
@@ -58,7 +58,7 @@ class PostItemViewModel: ObservableObject {
         
         Task {
             for imageUrl in imagesToLoad {
-                let result = await imageService.fetchImageWith(urlString: imageUrl)
+                let result = await imageContext.fetchImageWith(urlString: imageUrl)
                 
                 await MainActor.run {
                     switch result {

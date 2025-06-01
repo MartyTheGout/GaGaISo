@@ -14,7 +14,7 @@ class StoreItemViewModel: ObservableObject {
     let storeId: String
     
     private let storeContext: StoreContext
-    private let imageService: ImageService
+    private let imageContext: ImageContext
     private var cancellables = Set<AnyCancellable>()
     
     @Published var storeImages: [UIImage] = []
@@ -25,10 +25,10 @@ class StoreItemViewModel: ObservableObject {
         storeContext.store(for: storeId)
     }
     
-    init(storeId: String, storeContext: StoreContext, imageService: ImageService) {
+    init(storeId: String, storeContext: StoreContext, imageContext: ImageContext) {
         self.storeId = storeId
         self.storeContext = storeContext
-        self.imageService = imageService
+        self.imageContext = imageContext
         
         storeContext.$stores
             .map { $0[storeId] }
@@ -56,7 +56,7 @@ class StoreItemViewModel: ObservableObject {
         imageLoadError = nil
         
         Task {
-            let result = await imageService.fetchImageWith(urlString: urlString)
+            let result = await imageContext.fetchImageWith(urlString: urlString)
             
             await MainActor.run {
                 switch result {

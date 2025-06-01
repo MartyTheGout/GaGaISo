@@ -24,7 +24,7 @@ class DIContainer: ObservableObject {
     let storeService: StoreService
     let storeContext: StoreContext
     
-    let imageService: ImageService
+    let imageContext: ImageContext
     
     let orderContext: OrderContext
     
@@ -55,7 +55,7 @@ class DIContainer: ObservableObject {
         self.networkManager = StrategicNetworkHandler(client: networkClient, authManager: authManager)
         self.storeService = StoreService(networkManager: networkManager)
         self.storeContext = StoreContext(storeService: storeService)
-        self.imageService = ImageService(networkManager: networkManager)
+        self.imageContext = ImageContext(authManager: authManager)
         self.orderContext = OrderContext()
         
         self.chatService = ChatService(networkManager: networkManager)
@@ -105,7 +105,7 @@ class DIContainer: ObservableObject {
     }
     
     func getTrendingStoreCardViewModel(storeId: String) -> TrendingStoreCardViewModel {
-        TrendingStoreCardViewModel(storeId: storeId, storeContext: storeContext, imageService: imageService)
+        TrendingStoreCardViewModel(storeId: storeId, storeContext: storeContext, imageContext: imageContext)
     }
     
     func getStoreListViewModel() -> StoreListViewModel {
@@ -113,19 +113,19 @@ class DIContainer: ObservableObject {
     }
     
     func getStoreItemViewModel(storeId: String) -> StoreItemViewModel {
-        StoreItemViewModel(storeId: storeId, storeContext: storeContext, imageService: imageService)
+        StoreItemViewModel(storeId: storeId, storeContext: storeContext, imageContext: imageContext)
     }
     
     func getStoreDetailViewModel(storeId: String) -> StoreDetailViewModel {
-        StoreDetailViewModel(storeId: storeId, storeService: storeService, imageService: imageService, chatContext: chatContext)
+        StoreDetailViewModel(storeId: storeId, storeService: storeService, imageContext: imageContext, chatContext: chatContext)
     }
     
     func getMenuItemViewModel(menu: MenuList) -> MenuItemViewModel {
-        MenuItemViewModel(menu: menu, imageService: imageService)
+        MenuItemViewModel(menu: menu, imageContext: imageContext)
     }
     
     func getMenuDetailViewModel(menu: MenuList) -> MenuDetailViewModel {
-        MenuDetailViewModel(menu: menu, imageService: imageService, orderContext: orderContext)
+        MenuDetailViewModel(menu: menu, imageContext: imageContext, orderContext: orderContext)
     }
     
     func getChatListViewModel() -> ChatListViewModel {
@@ -141,6 +141,6 @@ class DIContainer: ObservableObject {
     }
     
     func getPostItemViewModel(postId: String) -> PostItemViewModel {
-        PostItemViewModel(postId: postId, communityContext: communityContext, imageService: imageService, locationManager: locationManager)
+        PostItemViewModel(postId: postId, communityContext: communityContext, imageContext: imageContext, locationManager: locationManager)
     }
 }

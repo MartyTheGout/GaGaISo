@@ -10,6 +10,7 @@ import UIKit
 import Kingfisher
 
 class ImageContext {
+    
     private let authManager: AuthManagerProtocol
     private let imageCache : ImageCache
     private let imageDownloader : ImageDownloader
@@ -35,8 +36,16 @@ class ImageContext {
     }
     
     func fetchImageWith(urlString: String) async -> Result<UIImage?, KingfisherError> {
-        guard let url = URL(string: urlString) else {
-            return .failure(.imageSettingError(reason: .emptySource)) // modify later
+        guard !urlString.isEmpty else {
+            return .failure(.requestError(reason: .emptyRequest))
+        }
+        
+        let imageRequest = ImageRouter.v1GetImage(resourcePath: urlString).createRequest(withToken: "")
+        
+        guard let url = imageRequest.url else {
+            print("❌ Invalid URL created from ImageRouter with resourcePath: '\(urlString)'")
+            print("   Full request URL: \(imageRequest)")
+            return .failure(.requestError(reason: .invalidURL(request: imageRequest)))
         }
         
         let modifier = ImageRequestAuthModifier(authManager: authManager)
@@ -85,12 +94,12 @@ class ImageContext {
         }
         
         // getaccessToken is not stored property, calcualted everytime when get called. so no need to have manual update.
-//        let updatedOptions = options.map { option in
-//            if case .requestModifier = option {
-//                return .requestModifier(ImageRequestAuthModifier(authManager: authManager))
-//            }
-//            return option
-//        }
+        //        let updatedOptions = options.map { option in
+        //            if case .requestModifier = option {
+        //                return .requestModifier(ImageRequestAuthModifier(authManager: authManager))
+        //            }
+        //            return option
+        //        }
         
         return await withCheckedContinuation { (continuation: CheckedContinuation<Result<UIImage?, KingfisherError>, Never>) in
             KingfisherManager.shared.retrieveImage(

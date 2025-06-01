@@ -14,7 +14,7 @@ class StoreDetailViewModel: ObservableObject {
     let storeId: String
     
     private let storeService: StoreService
-    private let imageService: ImageService
+    private let imageContext: ImageContext
     private let chatContext: ChatContext
 
     private var cancellables = Set<AnyCancellable>()
@@ -35,10 +35,10 @@ class StoreDetailViewModel: ObservableObject {
         }
     }
     
-    init(storeId: String, storeService: StoreService, imageService: ImageService, chatContext: ChatContext) {
+    init(storeId: String, storeService: StoreService, imageContext: ImageContext, chatContext: ChatContext) {
         self.storeId = storeId
         self.storeService = storeService
-        self.imageService = imageService
+        self.imageContext = imageContext
         self.chatContext = chatContext
     }
     
@@ -73,7 +73,7 @@ class StoreDetailViewModel: ObservableObject {
             storeImages.removeAll()
             
             for imageUrl in imageUrls {
-                let result = await imageService.fetchImageWith(urlString: imageUrl)
+                let result = await imageContext.fetchImageWith(urlString: imageUrl)
                 
                 switch result {
                 case .success(let image):
