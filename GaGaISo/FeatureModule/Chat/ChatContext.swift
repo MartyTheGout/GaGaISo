@@ -37,7 +37,7 @@ class ChatContext: ObservableObject {
         messagesToken?.invalidate()
     }
     
-    // MARK: - Setup
+    // MARK: - ChatContext Entire Setup
     private func setupRealmObservers() {
         let realm = try! Realm()
         
@@ -48,11 +48,17 @@ class ChatContext: ObservableObject {
             case .initial(let rooms):
                 self?.chatRooms = rooms.map { self?.mapToChatRoom(from: $0) }.compactMap { $0 }
                 self?.updateTotalUnreadCount()
-            case .update(let rooms, _, _, _):
+            case .update(let rooms, let deletions, let insertions, let modifications):
+                
+                guard !deletions.isEmpty || !insertions.isEmpty || !modifications.isEmpty else { return }
+                
+                print("Realm Write Tracking - Delete: \(deletions.count), Insert: \(insertions.count), Modify: \(modifications.count)")
+                
                 self?.chatRooms = rooms.map { self?.mapToChatRoom(from: $0) }.compactMap { $0 }
                 self?.updateTotalUnreadCount()
+                
             case .error(let error):
-                print("Realm 관찰 오류: \(error)")
+                print("Realm error : \(error)")
             }
         }
     }
@@ -71,10 +77,26 @@ class ChatContext: ObservableObject {
     
     private func loadInitialData() {
         loadChatRooms()
-        chatService.connectSocket()
     }
     
-    // MARK: - Public Methods
+    private func loadChatRooms() {
+        Task {
+            let result = await chatService.getChatRooms()
+            
+            switch result {
+            case .success(let rooms):
+                for room in rooms {
+                    saveChatRoom(room)
+                }
+            case .failure(let error):
+                await MainActor.run {
+                    errorMessage = error.localizedDescription + "\(#function)"
+                }
+            }
+        }
+    }
+    
+    // MARK: - ChatContext Action
     func createOrGetChatRoom(with userId: String) async -> ChatRoom? {
         let result = await chatService.createOrGetChatRoom(with: userId)
         
@@ -92,24 +114,23 @@ class ChatContext: ObservableObject {
     }
     
     @MainActor
-    func enterChatRoom(_ roomId: String) async { // socket 시작은 여기서부터
+    func enterChatRoom(_ roomId: String) {
+        
         currentRoomId = roomId
         
-        // 메시지 관찰 시작
         observeMessages(for: roomId)
         
-        // Socket 방 입장
-        chatService.joinRoom(roomId)
+        connectSocket(rommId: roomId)
         
-        // 읽음 처리
         markMessagesAsRead(in: roomId)
     }
     
     @MainActor
     func leaveChatRoom() {
-        guard let roomId = currentRoomId else { return }
+        guard let _ = currentRoomId else { return }
         
-        chatService.leaveRoom(roomId)
+        disconnectSocket()
+        
         currentRoomId = nil
         currentMessages = []
         messagesToken?.invalidate()
@@ -132,7 +153,14 @@ class ChatContext: ObservableObject {
         }
     }
     
-    // MARK: - Private Methods
+    //**Currently only handle new message from the existing socket connection : lately can be updated to have push notification here.
+    private func handleNewMessage(_ message: ChatMessage) {
+        saveMessage(message)
+    }
+}
+
+// MARK: - Realm Operations
+extension ChatContext {
     private func observeMessages(for roomId: String) {
         let realm = try! Realm()
         
@@ -146,39 +174,21 @@ class ChatContext: ObservableObject {
                 DispatchQueue.main.async {
                     self?.currentMessages = messages.map { self?.mapToChatMessage(from: $0) }.compactMap { $0 }
                 }
-            case .update(let messages, _, _, _):
+            case .update(let messages, let deletions, let insertions, let modifications):
+                guard !deletions.isEmpty || !insertions.isEmpty || !modifications.isEmpty else { return }
+                
+                print("Realm Write Tracking - Delete: \(deletions.count), Insert: \(insertions.count), Modify: \(modifications.count)")
+                
                 DispatchQueue.main.async {
                     self?.currentMessages = messages.map { self?.mapToChatMessage(from: $0) }.compactMap { $0 }
                 }
+    
             case .error(let error):
-                print("메시지 관찰 오류: \(error)")
+                print("Realm Error: \(error)")
             }
         }
     }
     
-    //Currently only handle new message from the existing socket connection
-    private func handleNewMessage(_ message: ChatMessage) {
-        saveMessage(message)
-    }
-    
-    private func loadChatRooms() {
-        Task {
-            let result = await chatService.getChatRooms()
-            
-            switch result {
-            case .success(let rooms):
-                for room in rooms {
-                    saveChatRoom(room)
-                }
-            case .failure(let error):
-                await MainActor.run {
-                    errorMessage = error.localizedDescription + "\(#function)"
-                }
-            }
-        }
-    }
-    
-    // MARK: - Realm Operations
     // Save loaded ChatRoom when realm has no updated data. different updated data.
     private func saveChatRoom(_ room: ChatRoom) {
         let realm = try! Realm()
@@ -215,7 +225,7 @@ class ChatContext: ObservableObject {
             realmRoom.createdAt = room.createdAt
             realmRoom.updatedAt = room.updatedAt
             
-            realm.add(realmRoom, update: .modified)
+            realm.add(realmRoom, update: .modified) // update option works, when same primary key record exists
             
             if let lastMessage = room.lastMessage {
                 saveMessageOnly(lastMessage, in: realm)
@@ -269,7 +279,7 @@ class ChatContext: ObservableObject {
         
         try! realm.write {
             let unreadMessages = realm.objects(RealmChatMessage.self)
-                .filter("roomId == %@ AND isRead == false AND senderId != %@", roomId, getCurrentUserId())
+                .filter("roomId == %@ AND isRead == false", roomId)
             
             for message in unreadMessages {
                 message.isRead = true
@@ -298,56 +308,6 @@ class ChatContext: ObservableObject {
         DispatchQueue.main.async {
             self.totalUnreadCount = total
         }
-    }
-    
-    // MARK: - Mapping
-    private func mapToChatRoom(from realmRoom: RealmChatRoom) -> ChatRoom {
-        let participants = Array(realmRoom.participants.map { realmParticipant in
-            Participant(
-                userId: realmParticipant.userId,
-                nick: realmParticipant.nick,
-                profileImage: realmParticipant.profileImage.isEmpty ? nil : realmParticipant.profileImage
-            )
-        })
-        
-        let lastMessage = realmRoom.lastMessage.map { mapToChatMessage(from: $0) }
-        
-        return ChatRoom(
-            id: realmRoom.id,
-            participants: participants,
-            lastMessage: lastMessage,
-            unreadCount: realmRoom.unreadCount,
-            createdAt: realmRoom.createdAt,
-            updatedAt: realmRoom.updatedAt
-        )
-    }
-    
-    private func mapToChatMessage(from realmMessage: RealmChatMessage) -> ChatMessage {
-        ChatMessage(
-            id: realmMessage.id,
-            roomId: realmMessage.roomId,
-            content: realmMessage.content,
-            senderId: realmMessage.senderId,
-            senderNick: realmMessage.senderNick,
-            senderProfileImage: realmMessage.senderProfileImage.isEmpty ? nil : realmMessage.senderProfileImage,
-            files: realmMessage.files.isEmpty ? nil : Array(realmMessage.files),
-            createdAt: realmMessage.createdAt,
-            isRead: realmMessage.isRead,
-            isSent: realmMessage.isSent
-        )
-    }
-    
-    private func getCurrentUserId() -> String {
-        // 실제 구현 필요
-        return ""
-    }
-    
-    func connectSocket() {
-        chatService.connectSocket()
-    }
-    
-    func disconnectSocket() {
-        chatService.disconnectSocket()
     }
 }
 
@@ -390,5 +350,55 @@ extension ChatContext {
     
     func loadChatRoomsPublic() async {
         loadChatRooms()
+    }
+}
+
+// MARK: - Mapping
+extension ChatContext {
+    private func mapToChatRoom(from realmRoom: RealmChatRoom) -> ChatRoom {
+        let participants = Array(realmRoom.participants.map { realmParticipant in
+            Participant(
+                userId: realmParticipant.userId,
+                nick: realmParticipant.nick,
+                profileImage: realmParticipant.profileImage.isEmpty ? nil : realmParticipant.profileImage
+            )
+        })
+        
+        let lastMessage = realmRoom.lastMessage.map { mapToChatMessage(from: $0) }
+        
+        return ChatRoom(
+            id: realmRoom.id,
+            participants: participants,
+            lastMessage: lastMessage,
+            unreadCount: realmRoom.unreadCount,
+            createdAt: realmRoom.createdAt,
+            updatedAt: realmRoom.updatedAt
+        )
+    }
+    
+    private func mapToChatMessage(from realmMessage: RealmChatMessage) -> ChatMessage {
+        ChatMessage(
+            id: realmMessage.id,
+            roomId: realmMessage.roomId,
+            content: realmMessage.content,
+            senderId: realmMessage.senderId,
+            senderNick: realmMessage.senderNick,
+            senderProfileImage: realmMessage.senderProfileImage.isEmpty ? nil : realmMessage.senderProfileImage,
+            files: realmMessage.files.isEmpty ? nil : Array(realmMessage.files),
+            createdAt: realmMessage.createdAt,
+            isRead: realmMessage.isRead,
+            isSent: realmMessage.isSent
+        )
+    }
+}
+
+//MARK: - Socket
+extension ChatContext {
+    func connectSocket(rommId: String) {
+        chatService.connectSocket(roomId: rommId)
+    }
+    
+    func disconnectSocket() {
+        chatService.disconnectSocket()
     }
 }

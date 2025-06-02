@@ -16,7 +16,6 @@ class ChatListViewModel: ObservableObject {
     @Published var searchText = ""
     @Published var selectedUsers: [Participant] = []
     
-    // 임시 사용자 목록 (실제로는 서버에서 가져와야 함)
     @Published var availableUsers: [Participant] = [
         Participant(userId: "1", nick: "김가가", profileImage: nil),
         Participant(userId: "2", nick: "이이소", profileImage: nil),
@@ -27,27 +26,6 @@ class ChatListViewModel: ObservableObject {
     
     init(chatContext: ChatContext) {
         self.chatContext = chatContext
-        setupObservers()
-    }
-    
-    private func setupObservers() {
-        chatContext.$chatRooms
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-            .store(in: &cancellables)
-        
-        chatContext.$isLoading
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-            .store(in: &cancellables)
-        
-        chatContext.$totalUnreadCount
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-            .store(in: &cancellables)
     }
     
     // MARK: - Public Properties
@@ -75,15 +53,12 @@ class ChatListViewModel: ObservableObject {
     
     // MARK: - Public Methods
     func loadChatRooms() async {
+        print(self, #function)
         await chatContext.loadChatRoomsPublic()
     }
     
     func refreshChatRooms() async {
         await chatContext.refreshChatRooms()
-    }
-    
-    func connectSocket() {
-        chatContext.connectSocket()
     }
     
     func createChatRoom(with user: Participant) async -> Bool {
@@ -96,10 +71,10 @@ class ChatListViewModel: ObservableObject {
         return false
     }
     
-    func deleteChatRoom(at offsets: IndexSet) async {
+    func deleteChatRoom(at offsets: IndexSet) {
         for index in offsets {
             let roomId = chatRooms[index].id
-            await chatContext.deleteChatRoom(roomId)
+            chatContext.deleteChatRoom(roomId)
         }
     }
     

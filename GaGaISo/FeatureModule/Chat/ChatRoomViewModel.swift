@@ -12,6 +12,7 @@ class ChatRoomViewModel: ObservableObject {
     private let chatContext: ChatContext
     private var cancellables = Set<AnyCancellable>()
     
+    @Published var messages: [ChatMessage] = []
     @Published var messageText = ""
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -20,19 +21,21 @@ class ChatRoomViewModel: ObservableObject {
     init(roomId: String, chatContext: ChatContext) {
         self.roomId = roomId
         self.chatContext = chatContext
+        
         setupObservers()
-        print("ChatRoomViewModelInit")
+        
+        Task {
+            await chatContext.enterChatRoom(roomId)
+        }
     }
     
     private func setupObservers() {
         chatContext.$currentMessages
             .sink { [weak self] messages in
-                if !messages.isEmpty {
-                    self?.shouldScrollToBottom = true
-                }
-                self?.objectWillChange.send()
+                self?.messages = messages
             }
             .store(in: &cancellables)
+        
         
         chatContext.$errorMessage
             .sink { [weak self] error in
@@ -42,10 +45,6 @@ class ChatRoomViewModel: ObservableObject {
     }
     
     // MARK: - Public Properties
-    var messages: [ChatMessage] {
-        chatContext.currentMessages
-    }
-    
     var chatRoom: ChatRoom? {
         chatContext.getChatRoom(by: roomId)
     }

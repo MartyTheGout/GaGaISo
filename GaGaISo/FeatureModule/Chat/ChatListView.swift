@@ -39,13 +39,9 @@ struct ChatListView: View {
                 }
             }
             .sheet(isPresented: $viewModel.showingNewChatSheet) {
-                NewChatView(viewModel: viewModel)
-            }
-            .refreshable {
-                await viewModel.refreshChatRooms()
+                //
             }
             .onAppear {
-                viewModel.connectSocket()
                 Task {
                     await viewModel.loadChatRooms()
                 }
@@ -118,13 +114,12 @@ struct ChatListView: View {
     }
 }
 
-// MARK: - Chat Room Row View (채팅방 리스트 행)
+// MARK: - Chat Room Row View
 struct ChatRoomRowView: View {
     let room: ChatRoom
     
     var body: some View {
         HStack(spacing: 12) {
-            // 프로필 이미지
             AsyncImage(url: URL(string: room.otherParticipant?.profileImage ?? "")) { image in
                 image
                     .resizable()
@@ -142,21 +137,18 @@ struct ChatRoomRowView: View {
             
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
-                    // 이름
                     Text(room.otherParticipant?.nick ?? "알 수 없음")
                         .pretendardFont(size: .body2, weight: .bold)
                         .foregroundColor(.gray90)
                     
                     Spacer()
                     
-                    // 시간
                     Text(timeString(from: room.updatedAt))
                         .pretendardFont(size: .caption1)
                         .foregroundColor(.gray60)
                 }
                 
                 HStack {
-                    // 마지막 메시지
                     Text(room.lastMessage?.content ?? "채팅을 시작해보세요!")
                         .pretendardFont(size: .body3)
                         .foregroundColor(.gray60)
@@ -164,7 +156,6 @@ struct ChatRoomRowView: View {
                     
                     Spacer()
                     
-                    // 미읽은 메시지 개수
                     if room.unreadCount > 0 {
                         Text("\(room.unreadCount)")
                             .pretendardFont(size: .caption2, weight: .bold)
@@ -184,27 +175,27 @@ struct ChatRoomRowView: View {
            let now = Date()
            let calendar = Calendar.current
            
-           // 오늘인지 확인
+           // timeString: "오늘"
            if calendar.isDate(date, inSameDayAs: now) {
                let formatter = DateFormatter()
                formatter.timeStyle = .short
                return formatter.string(from: date)
            }
            
-           // 어제인지 확인
+           // timeString: "어제"
            if let yesterday = calendar.date(byAdding: .day, value: -1, to: now),
               calendar.isDate(date, inSameDayAs: yesterday) {
                return "어제"
            }
            
-           // 그 외의 경우
+           // timeString: e.g. "5/28"
            let formatter = DateFormatter()
            formatter.dateFormat = "M/d"
            return formatter.string(from: date)
        }
 }
 
-// MARK: - New Chat View (새 채팅 생성 화면)
+// MARK: - New Chat View
 struct NewChatView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject var viewModel: ChatListViewModel

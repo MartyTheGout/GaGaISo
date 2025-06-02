@@ -20,7 +20,6 @@ class ChatService: ObservableObject {
     
     init(networkManager: StrategicNetworkHandler) {
         self.networkManager = networkManager
-        setupSocket()
     }
     
     func createOrGetChatRoom(with userId: String) async -> Result<ChatRoom, APIError> {
@@ -38,16 +37,13 @@ class ChatService: ObservableObject {
     }
     
     func sendMessage(roomId: String, content: String, files: [String]?) async -> Result<ChatMessage, APIError> {
-        
-        socket?.emit("message", content)
-        
         let result = await networkManager.request(ChatRouter.v1SendMessage(roomId: roomId, message: content, fileURL: files ?? []), type: LastChatDTO.self)
-        
+        dump(result)
         return result.map { mapToChatMessage(from: $0) }
     }
-    
-    // Socket 관련
-    func connectSocket() {
+
+    func connectSocket(roomId: String) {
+        setupSocket(roomId: roomId)
         socket?.connect()
     }
     
@@ -55,29 +51,27 @@ class ChatService: ObservableObject {
         socket?.disconnect()
     }
     
-    func joinRoom(_ roomId: String) {
-        socket?.emit("join_room", roomId)
-    }
-    
-    func leaveRoom(_ roomId: String) {
-        socket?.emit("leave_room", roomId)
-    }
-    
-    private func setupSocket() {
+    private func setupSocket(roomId: String) {
+//        guard let url = URL(string: ExternalDatasource.pickup.baseURLString + "/chats-\(roomId)") else { return }
         guard let url = URL(string: ExternalDatasource.pickup.baseURLString) else { return }
+        print(url.absoluteString)
         
         manager = SocketManager(socketURL: url, config: [
+            .forcePolling(false),
+            .log(true),
+            .compress,
             .extraHeaders(
                 [
-                    "Authorization": "\(networkManager.getAccessToken())",
+                    "Authorization": networkManager.getAccessToken() ?? "",
                     "SeSACKey": APIKey.PICKUP
                 ]
             )
         ])
         
-        socket = manager?.defaultSocket
+        socket = manager?.socket(forNamespace: "/chats-\(roomId)")
+
+//        socket = manager?.defaultSocket
         
-        // 연결 상태 모니터링
         socket?.on(clientEvent: .connect) { [weak self] _, _ in
             DispatchQueue.main.async {
                 print("socket connection created")
@@ -87,6 +81,7 @@ class ChatService: ObservableObject {
         
         socket?.on(clientEvent: .disconnect) { [weak self] _, _ in
             DispatchQueue.main.async {
+                print("socket connection disconnected")
                 self?.connectionStatus = .disconnected
             }
         }
@@ -96,15 +91,22 @@ class ChatService: ObservableObject {
                 self?.connectionStatus = .error(data.first as? String ?? "Unknown error")
             }
         }
-        
-        socket?.on("message") { [weak self] data, _ in
-            dump(data)
-//            DispatchQueue.main.async {
-//                self?.newMessage = data.first as? String?
-//            }
+        // For Debugging
+//        socket?.onAny { event in
+//            print("🎯 받은 모든 이벤트: \(event.event)")
+//            dump(event)
+//        }
+
+        //TODO: Chat Messsage Converting and Insert to Realm
+        socket?.on("chat") { data, _ in
+            DispatchQueue.main.async {
+                //ChatMessage로 케스팅해서 newMessage 로 Assign
+            }
         }
     }
-    
+}
+
+extension ChatService {
     private func mapToChatRoom(from dto: ChatRoomDTO) -> ChatRoom {
         return ChatRoom(id: dto.roomId, participants: dto.participants, lastMessage: nil, unreadCount: 0, createdAt: Date(), updatedAt: Date())
     }
