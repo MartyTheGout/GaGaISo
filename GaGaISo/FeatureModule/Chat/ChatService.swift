@@ -17,7 +17,6 @@ class ChatService: ObservableObject {
     @Published var newMessage: ChatMessage?
     @Published var connectionStatus: SocketConnectionStatus = .disconnected
     
-    
     init(networkManager: StrategicNetworkHandler) {
         self.networkManager = networkManager
     }
@@ -41,7 +40,7 @@ class ChatService: ObservableObject {
         dump(result)
         return result.map { mapToChatMessage(from: $0) }
     }
-
+    
     func connectSocket(roomId: String) {
         setupSocket(roomId: roomId)
         socket?.connect()
@@ -52,13 +51,9 @@ class ChatService: ObservableObject {
     }
     
     private func setupSocket(roomId: String) {
-//        guard let url = URL(string: ExternalDatasource.pickup.baseURLString + "/chats-\(roomId)") else { return }
         guard let url = URL(string: ExternalDatasource.pickup.baseURLString) else { return }
-        print(url.absoluteString)
         
         manager = SocketManager(socketURL: url, config: [
-            .forcePolling(false),
-            .log(true),
             .compress,
             .extraHeaders(
                 [
@@ -69,8 +64,6 @@ class ChatService: ObservableObject {
         ])
         
         socket = manager?.socket(forNamespace: "/chats-\(roomId)")
-
-//        socket = manager?.defaultSocket
         
         socket?.on(clientEvent: .connect) { [weak self] _, _ in
             DispatchQueue.main.async {
@@ -91,16 +84,26 @@ class ChatService: ObservableObject {
                 self?.connectionStatus = .error(data.first as? String ?? "Unknown error")
             }
         }
-        // For Debugging
-//        socket?.onAny { event in
-//            print("🎯 받은 모든 이벤트: \(event.event)")
-//            dump(event)
-//        }
-
-        //TODO: Chat Messsage Converting and Insert to Realm
+        
         socket?.on("chat") { data, _ in
-            DispatchQueue.main.async {
-                //ChatMessage로 케스팅해서 newMessage 로 Assign
+            guard let messageDict = data.first as? [String: Any] else {
+                print("[Socket Message Reciever Error] Failed to convert Dictionary from first Any")
+                dump(data)
+                return
+            }
+            
+            do {
+                let jsonData = try JSONSerialization.data(withJSONObject: messageDict)
+                let socketMessage = try JSONDecoder().decode(SocketChatMessageDTO.self, from: jsonData)
+                let chateMessage = socketMessage.toChatMessage()
+                
+                DispatchQueue.main.async { [weak self] in
+                    print("Success converting, saving to ChatService's property")
+                    self?.newMessage = chateMessage
+                }
+            } catch {
+                print("[Socket Message Reciever Error] Failed to convert ChatMessage from JSONObject")
+                dump(error)
             }
         }
     }
@@ -108,7 +111,25 @@ class ChatService: ObservableObject {
 
 extension ChatService {
     private func mapToChatRoom(from dto: ChatRoomDTO) -> ChatRoom {
-        return ChatRoom(id: dto.roomId, participants: dto.participants, lastMessage: nil, unreadCount: 0, createdAt: Date(), updatedAt: Date())
+        let dateFormatter = ISO8601DateFormatter()
+        let createdAt = dateFormatter.date(from: dto.createdAt) ?? Date()
+        let updatedAt = dateFormatter.date(from: dto.updatedAt) ?? Date()
+        var chatMessage: ChatMessage?
+        
+        if let lastChat = dto.lastChat {
+            chatMessage = mapToChatMessage(from: lastChat)
+        } else {
+            chatMessage = nil
+        }
+        
+        return ChatRoom(
+            id: dto.roomId,
+            participants: dto.participants,
+            lastMessage: chatMessage,
+            unreadCount: 0,
+            createdAt: createdAt,
+            updatedAt: updatedAt
+        )
     }
     
     private func mapToChatMessage(from dto: LastChatDTO) -> ChatMessage {

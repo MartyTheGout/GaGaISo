@@ -106,7 +106,7 @@ struct ChatListView: View {
             }
             .onDelete { offsets in
                 Task {
-                    await viewModel.deleteChatRoom(at: offsets)
+                    viewModel.deleteChatRoom(at: offsets)
                 }
             }
         }
@@ -193,84 +193,4 @@ struct ChatRoomRowView: View {
            formatter.dateFormat = "M/d"
            return formatter.string(from: date)
        }
-}
-
-// MARK: - New Chat View
-struct NewChatView: View {
-    @Environment(\.dismiss) private var dismiss
-    @ObservedObject var viewModel: ChatListViewModel
-    @State private var isLoading = false
-    
-    var body: some View {
-        NavigationStack {
-            VStack {
-                // 검색 바
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray60)
-                    
-                    TextField("사용자 검색", text: $viewModel.searchText)
-                        .pretendardFont(size: .body2)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(Color.gray15)
-                .cornerRadius(12)
-                .padding(.horizontal)
-                
-                // 사용자 목록
-                List(viewModel.filteredUsers, id: \.userId) { user in
-                    Button(action: {
-                        Task {
-                            await createChatRoom(with: user)
-                        }
-                    }) {
-                        HStack(spacing: 12) {
-                            // 프로필 이미지
-                            Circle()
-                                .fill(Color.gray15)
-                                .frame(width: 40, height: 40)
-                                .overlay(
-                                    Image(systemName: "person.fill")
-                                        .foregroundColor(.gray60)
-                                )
-                            
-                            Text(user.nick)
-                                .pretendardFont(size: .body2)
-                                .foregroundColor(.gray90)
-                            
-                            Spacer()
-                            
-                            if isLoading {
-                                ProgressView()
-                                    .scaleEffect(0.8)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .disabled(isLoading)
-                }
-                .listStyle(PlainListStyle())
-            }
-            .navigationTitle("새 채팅")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("취소") {
-                        viewModel.hideNewChatSheet()
-                    }
-                }
-            }
-        }
-    }
-    
-    private func createChatRoom(with user: Participant) async {
-        isLoading = true
-        let success = await viewModel.createChatRoom(with: user)
-        isLoading = false
-        
-        if success {
-            dismiss()
-        }
-    }
 }

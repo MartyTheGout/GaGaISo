@@ -11,6 +11,7 @@ import RealmSwift
 
 class ChatContext: ObservableObject {
     private let chatService: ChatService
+    private let userRealmManager: UserRealmManager
     private var cancellables = Set<AnyCancellable>()
     
     @Published private(set) var chatRooms: [ChatRoom] = []
@@ -24,12 +25,11 @@ class ChatContext: ObservableObject {
     private var roomsToken: NotificationToken?
     private var messagesToken: NotificationToken?
     
-    init(chatService: ChatService) {
+    init(chatService: ChatService, userRealmManager: UserRealmManager) {
         self.chatService = chatService
+        self.userRealmManager = userRealmManager
         
-        setupRealmObservers()
         setupServiceObservers()
-        loadInitialData()
     }
     
     deinit {
@@ -37,9 +37,15 @@ class ChatContext: ObservableObject {
         messagesToken?.invalidate()
     }
     
+    //TODO: Dependency Issue
+    func initializeWithLocationDB() {
+        setupRealmObservers()
+        loadChatRooms()
+    }
+    
     // MARK: - ChatContext Entire Setup
     private func setupRealmObservers() {
-        let realm = try! Realm()
+        let realm = userRealmManager.createRealm()
         
         let realmRooms = realm.objects(RealmChatRoom.self).sorted(byKeyPath: "updatedAt", ascending: false)
         
@@ -51,8 +57,7 @@ class ChatContext: ObservableObject {
             case .update(let rooms, let deletions, let insertions, let modifications):
                 
                 guard !deletions.isEmpty || !insertions.isEmpty || !modifications.isEmpty else { return }
-                
-                print("Realm Write Tracking - Delete: \(deletions.count), Insert: \(insertions.count), Modify: \(modifications.count)")
+                print("Realm Write Tracking \(#function) - Delete: \(deletions.count), Insert: \(insertions.count), Modify: \(modifications.count)")
                 
                 self?.chatRooms = rooms.map { self?.mapToChatRoom(from: $0) }.compactMap { $0 }
                 self?.updateTotalUnreadCount()
@@ -73,10 +78,6 @@ class ChatContext: ObservableObject {
                 self?.handleNewMessage(message)
             }
             .store(in: &cancellables)
-    }
-    
-    private func loadInitialData() {
-        loadChatRooms()
     }
     
     private func loadChatRooms() {
@@ -142,8 +143,8 @@ class ChatContext: ObservableObject {
         let result = await chatService.sendMessage(roomId: roomId, content: content, files: files)
         
         switch result {
-        case .success(let message):
-            saveMessage(message)
+        case .success:
+            // subscription on chatService.newMessage will save the message to Realm.
             return true
         case .failure(let error):
             await MainActor.run {
@@ -162,7 +163,7 @@ class ChatContext: ObservableObject {
 // MARK: - Realm Operations
 extension ChatContext {
     private func observeMessages(for roomId: String) {
-        let realm = try! Realm()
+        let realm = userRealmManager.createRealm()
         
         let realmMessages = realm.objects(RealmChatMessage.self)
             .filter("roomId == %@", roomId)
@@ -177,7 +178,7 @@ extension ChatContext {
             case .update(let messages, let deletions, let insertions, let modifications):
                 guard !deletions.isEmpty || !insertions.isEmpty || !modifications.isEmpty else { return }
                 
-                print("Realm Write Tracking - Delete: \(deletions.count), Insert: \(insertions.count), Modify: \(modifications.count)")
+                print("Realm Write Tracking \(#function) - Delete: \(deletions.count), Insert: \(insertions.count), Modify: \(modifications.count)")
                 
                 DispatchQueue.main.async {
                     self?.currentMessages = messages.map { self?.mapToChatMessage(from: $0) }.compactMap { $0 }
@@ -191,7 +192,7 @@ extension ChatContext {
     
     // Save loaded ChatRoom when realm has no updated data. different updated data.
     private func saveChatRoom(_ room: ChatRoom) {
-        let realm = try! Realm()
+        let realm = userRealmManager.createRealm()
         
         let realmRoom = realm.objects(RealmChatRoom.self).where { $0.id == room.id }.first
         
@@ -228,6 +229,8 @@ extension ChatContext {
             realm.add(realmRoom, update: .modified) // update option works, when same primary key record exists
             
             if let lastMessage = room.lastMessage {
+                print("lastMessage inserting logic test")
+                dump(room.lastMessage)
                 saveMessageOnly(lastMessage, in: realm)
             }
         }
@@ -256,7 +259,7 @@ extension ChatContext {
     }
     
     private func saveMessage(_ message: ChatMessage, shouldUpdateRoom: Bool = true) {
-        let realm = try! Realm()
+        let realm = userRealmManager.createRealm()
         
         try! realm.write {
             saveMessageOnly(message, in: realm)
@@ -275,7 +278,7 @@ extension ChatContext {
     }
     
     private func markMessagesAsRead(in roomId: String) {
-        let realm = try! Realm()
+        let realm = userRealmManager.createRealm()
         
         try! realm.write {
             let unreadMessages = realm.objects(RealmChatMessage.self)
@@ -292,7 +295,7 @@ extension ChatContext {
     }
     
     private func incrementUnreadCount(for roomId: String) {
-        let realm = try! Realm()
+        let realm = userRealmManager.createRealm()
         
         try! realm.write {
             if let room = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: roomId) {
@@ -302,7 +305,7 @@ extension ChatContext {
     }
     
     private func updateTotalUnreadCount() {
-        let realm = try! Realm()
+        let realm = userRealmManager.createRealm()
         
         let total: Int = realm.objects(RealmChatRoom.self).sum(ofProperty: "unreadCount")
         DispatchQueue.main.async {
@@ -337,7 +340,7 @@ extension ChatContext {
     }
     
     func deleteChatRoom(_ roomId: String) {
-        let realm = try! Realm()
+        let realm = userRealmManager.createRealm()
         
         try! realm.write {
             if let roomToDelete = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: roomId) {

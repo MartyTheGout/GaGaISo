@@ -15,10 +15,13 @@ final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
     private let authStore: AuthStore
     private let deviceToken : String?
     
-    init(authStore: AuthStore, networkClient: RawNetworkClient ) {
+    private let userRealmManager: UserRealmManager
+    
+    init(authStore: AuthStore, networkClient: RawNetworkClient, userRealmManager: UserRealmManager) {
         self.authStore = authStore
         self.deviceToken = authStore.deviceToken
         self.client = networkClient
+        self.userRealmManager = userRealmManager
     }
     
     func bootstrap() async {
@@ -38,8 +41,7 @@ final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
         switch result {
             
         case .success(let tokens):
-            authStore.accessToken = tokens.accessToken
-            authStore.refreshToken = tokens.refreshToken
+            saveTokenToStore(tokens.accessToken, tokens.refreshToken)
             await MainActor.run { self.isLoggedIn = true }
             return true
         case .failure:
@@ -83,14 +85,14 @@ extension AuthenticationManager {
         
         switch response {
         case .success(let result):
-            print("❌ Apple Login 성공: \(result)")
             saveTokenToStore(result.accessToken, result.refreshToken)
+            userRealmManager.setCurrentUser(result.user_id)
             await setLoginState(true)
             return .success(())
             
         case .failure(let error):
-            print("❌ Apple Login 실패: \(error)")
             await setLoginState(false)
+            userRealmManager.setCurrentUser(nil)
             return .failure(error)
         }
     }
@@ -110,11 +112,12 @@ extension AuthenticationManager {
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
+            userRealmManager.setCurrentUser(result.user_id)
             await setLoginState(true)
             return .success(())
             
         case .failure(let error):
-            print("❌ Kakao Login 실패: \(error)")
+            userRealmManager.setCurrentUser(nil)
             await setLoginState(false)
             return .failure(error)
         }
@@ -134,12 +137,12 @@ extension AuthenticationManager {
         
         switch response {
         case .success(let result):
-            print("❌ Email Login 성공: \(result)")
             saveTokenToStore(result.accessToken, result.refreshToken)
+            userRealmManager.setCurrentUser(result.user_id)
             await setLoginState(true)
             return .success(())
         case .failure(let error):
-            print("❌ Email Login 실패: \(error)")
+            userRealmManager.setCurrentUser(nil)
             await setLoginState(false)
             return .failure(error)
         }
@@ -151,10 +154,11 @@ extension AuthenticationManager {
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
+            userRealmManager.setCurrentUser(result.user_id)
             await setLoginState(true)
             return .success(())
         case .failure(let error):
-            print(error)
+            userRealmManager.setCurrentUser(nil)
             return .failure(error)
         }
     }

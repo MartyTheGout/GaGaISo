@@ -16,16 +16,9 @@ class ChatListViewModel: ObservableObject {
     @Published var searchText = ""
     @Published var selectedUsers: [Participant] = []
     
-    @Published var availableUsers: [Participant] = [
-        Participant(userId: "1", nick: "김가가", profileImage: nil),
-        Participant(userId: "2", nick: "이이소", profileImage: nil),
-        Participant(userId: "3", nick: "박맛집", profileImage: nil),
-        Participant(userId: "4", nick: "최치킨", profileImage: nil),
-        Participant(userId: "5", nick: "정피자", profileImage: nil)
-    ]
-    
     init(chatContext: ChatContext) {
         self.chatContext = chatContext
+        chatContext.initializeWithLocationDB() //HISTORY: having userRealmManager dependency, which also depends on AuthManager lead to the isuse that realm cannot be used without currentUserId, To delay the ChatContext's complete initialization with local data, push it later with "initializeWithLocationDB()". and call it when ChatList i
     }
     
     // MARK: - Public Properties
@@ -41,19 +34,8 @@ class ChatListViewModel: ObservableObject {
         chatContext.totalUnreadCount
     }
     
-    var filteredUsers: [Participant] {
-        if searchText.isEmpty {
-            return availableUsers
-        } else {
-            return availableUsers.filter {
-                $0.nick.localizedCaseInsensitiveContains(searchText)
-            }
-        }
-    }
-    
     // MARK: - Public Methods
     func loadChatRooms() async {
-        print(self, #function)
         await chatContext.loadChatRoomsPublic()
     }
     
