@@ -38,10 +38,11 @@ class RealmCurrentUser: Object, ObjectKeyIdentifiable {
     static func setCurrentUser(userId: String, nick: String) {
         let realm = try! Realm()
         
+        let currentUserId = getCurrentUserId()
+        if userId == currentUserId { return }
+        
         try! realm.write {
-            if let existingUser = realm.objects(RealmCurrentUser.self).first,
-               existingUser.userId != userId {
-                
+            if let currentUserId, currentUserId != userId {
                 print("[User Setting] New Login detected")
                 realm.delete(realm.objects(RealmCurrentUser.self))
                 realm.delete(realm.objects(RealmChatRoom.self))

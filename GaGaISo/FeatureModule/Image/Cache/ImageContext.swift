@@ -10,7 +10,6 @@ import UIKit
 import Kingfisher
 
 class ImageContext {
-    
     private let authManager: AuthManagerProtocol
     private let imageCache : ImageCache
     private let imageDownloader : ImageDownloader
@@ -62,6 +61,7 @@ class ImageContext {
         return await performImageRequest(url:url, options: options)
     }
     
+    //TODO: SWIFT TASK CONTINUATION MISUSE: performImageRequest(url:options:) leaked its continuation!
     private func performImageRequest(url: URL, options: KingfisherOptionsInfo) async -> Result<UIImage?, KingfisherError> {
         await withCheckedContinuation { (continuation: CheckedContinuation<Result<UIImage?, KingfisherError>, Never>) in
             KingfisherManager.shared.retrieveImage(
@@ -93,14 +93,6 @@ class ImageContext {
             return .failure(.requestError(reason: .emptyRequest))
         }
         
-        // getaccessToken is not stored property, calcualted everytime when get called. so no need to have manual update.
-        //        let updatedOptions = options.map { option in
-        //            if case .requestModifier = option {
-        //                return .requestModifier(ImageRequestAuthModifier(authManager: authManager))
-        //            }
-        //            return option
-        //        }
-        
         return await withCheckedContinuation { (continuation: CheckedContinuation<Result<UIImage?, KingfisherError>, Never>) in
             KingfisherManager.shared.retrieveImage(
                 with: url,
@@ -119,7 +111,7 @@ class ImageContext {
     private func isAuthError(_ error: KingfisherError) -> Bool {
         if case .responseError(let reason) = error,
            case .invalidHTTPStatusCode(let response) = reason {
-            return response.statusCode == 401 || response.statusCode == 419
+            return response.statusCode == 419
         }
         return false
     }
