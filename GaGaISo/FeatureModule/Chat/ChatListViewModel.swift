@@ -18,7 +18,6 @@ class ChatListViewModel: ObservableObject {
     
     init(chatContext: ChatContext) {
         self.chatContext = chatContext
-        chatContext.initializeWithLocationDB() //HISTORY: having userRealmManager dependency, which also depends on AuthManager lead to the isuse that realm cannot be used without currentUserId, To delay the ChatContext's complete initialization with local data, push it later with "initializeWithLocationDB()". and call it when ChatList i
     }
     
     // MARK: - Public Properties

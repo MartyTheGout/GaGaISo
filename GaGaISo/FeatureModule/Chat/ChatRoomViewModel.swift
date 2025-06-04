@@ -21,7 +21,6 @@ class ChatRoomViewModel: ObservableObject {
     init(roomId: String, chatContext: ChatContext) {
         self.roomId = roomId
         self.chatContext = chatContext
-        chatContext.initializeWithLocationDB() // TODO: fix it later
         
         setupObservers()
     }

@@ -17,12 +17,7 @@ struct ChatRoom: Identifiable, Codable {
     var updatedAt: Date
     
     var otherParticipant: Participant? {
-        participants.first { $0.userId != getCurrentUserId() }
-    }
-    
-    private func getCurrentUserId() -> String {
-        // 현재 사용자 ID 반환 로직
-        return "" // 실제 구현 필요
+        participants.first { $0.userId != RealmCurrentUser.getCurrentUserId() }
     }
 }
 
@@ -37,13 +32,5 @@ struct ChatMessage: Identifiable, Codable {
     let createdAt: Date
     var isRead: Bool = false
     var isSent: Bool = true
-    
-    var isMyMessage: Bool {
-        senderId == getCurrentUserId()
-    }
-    
-    private func getCurrentUserId() -> String {
-        // 현재 사용자 ID 반환 로직
-        return "" // 실제 구현 필요
-    }
+    var isMyMessage: Bool
 }

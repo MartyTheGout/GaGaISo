@@ -146,7 +146,8 @@ extension ChatService {
             files: dto.files,
             createdAt: createdAt,
             isRead: false,
-            isSent: true
+            isSent: true,
+            isMyMessage:  dto.sender.userId == RealmCurrentUser.getCurrentUserId()
         )
     }
 }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
     @Published var isLoggedIn: Bool = false
@@ -15,13 +16,10 @@ final class AuthenticationManager: ObservableObject, AuthManagerProtocol {
     private let authStore: AuthStore
     private let deviceToken : String?
     
-    private let userRealmManager: UserRealmManager
-    
-    init(authStore: AuthStore, networkClient: RawNetworkClient, userRealmManager: UserRealmManager) {
+    init(authStore: AuthStore, networkClient: RawNetworkClient) {
         self.authStore = authStore
         self.deviceToken = authStore.deviceToken
         self.client = networkClient
-        self.userRealmManager = userRealmManager
     }
     
     func bootstrap() async {
@@ -86,13 +84,12 @@ extension AuthenticationManager {
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
-            userRealmManager.setCurrentUser(result.user_id)
+            RealmCurrentUser.setCurrentUser(userId: result.user_id, nick: result.nick)
             await setLoginState(true)
             return .success(())
             
         case .failure(let error):
             await setLoginState(false)
-            userRealmManager.setCurrentUser(nil)
             return .failure(error)
         }
     }
@@ -112,12 +109,11 @@ extension AuthenticationManager {
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
-            userRealmManager.setCurrentUser(result.user_id)
+            RealmCurrentUser.setCurrentUser(userId: result.user_id, nick: result.nick)
             await setLoginState(true)
             return .success(())
             
         case .failure(let error):
-            userRealmManager.setCurrentUser(nil)
             await setLoginState(false)
             return .failure(error)
         }
@@ -138,11 +134,10 @@ extension AuthenticationManager {
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
-            userRealmManager.setCurrentUser(result.user_id)
+            RealmCurrentUser.setCurrentUser(userId: result.user_id, nick: result.nick)
             await setLoginState(true)
             return .success(())
         case .failure(let error):
-            userRealmManager.setCurrentUser(nil)
             await setLoginState(false)
             return .failure(error)
         }
@@ -154,11 +149,10 @@ extension AuthenticationManager {
         switch response {
         case .success(let result):
             saveTokenToStore(result.accessToken, result.refreshToken)
-            userRealmManager.setCurrentUser(result.user_id)
+            RealmCurrentUser.setCurrentUser(userId: result.user_id, nick: result.nick)
             await setLoginState(true)
             return .success(())
         case .failure(let error):
-            userRealmManager.setCurrentUser(nil)
             return .failure(error)
         }
     }

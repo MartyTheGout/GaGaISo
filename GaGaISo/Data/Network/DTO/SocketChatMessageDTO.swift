@@ -30,7 +30,6 @@ struct SocketChatMessageDTO: Codable {
         let dateFormatter = ISO8601DateFormatter()
         let createdAtDate = dateFormatter.date(from: createdAt) ?? Date()
 
-        
         return ChatMessage(
             id: chatId,
             roomId: roomId,
@@ -41,7 +40,8 @@ struct SocketChatMessageDTO: Codable {
             files: files.isEmpty ? nil : files,
             createdAt: createdAtDate,
             isRead: false,
-            isSent: true
+            isSent: true,
+            isMyMessage: false // Point* : It is not necessary to have real value of 'isMyMessage' here. That would be calculated when transferred to Realm
         )
     }
 }

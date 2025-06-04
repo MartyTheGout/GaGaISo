@@ -11,7 +11,6 @@ import RealmSwift
 
 class ChatContext: ObservableObject {
     private let chatService: ChatService
-    private let userRealmManager: UserRealmManager
     private var cancellables = Set<AnyCancellable>()
     
     @Published private(set) var chatRooms: [ChatRoom] = []
@@ -25,11 +24,12 @@ class ChatContext: ObservableObject {
     private var roomsToken: NotificationToken?
     private var messagesToken: NotificationToken?
     
-    init(chatService: ChatService, userRealmManager: UserRealmManager) {
+    init(chatService: ChatService) {
         self.chatService = chatService
-        self.userRealmManager = userRealmManager
-        
         setupServiceObservers()
+        setupRealmObservers()
+        loadChatRooms()
+        
     }
     
     deinit {
@@ -37,15 +37,11 @@ class ChatContext: ObservableObject {
         messagesToken?.invalidate()
     }
     
-    //TODO: Dependency Issue
-    func initializeWithLocationDB() {
-        setupRealmObservers()
-        loadChatRooms()
-    }
-    
     // MARK: - ChatContext Entire Setup
     private func setupRealmObservers() {
-        let realm = userRealmManager.createRealm()
+        let realm = try! Realm()
+        
+        print("Realm Location", realm.configuration.fileURL)
         
         let realmRooms = realm.objects(RealmChatRoom.self).sorted(byKeyPath: "updatedAt", ascending: false)
         
@@ -163,7 +159,7 @@ class ChatContext: ObservableObject {
 // MARK: - Realm Operations
 extension ChatContext {
     private func observeMessages(for roomId: String) {
-        let realm = userRealmManager.createRealm()
+        let realm = try! Realm()
         
         let realmMessages = realm.objects(RealmChatMessage.self)
             .filter("roomId == %@", roomId)
@@ -192,7 +188,7 @@ extension ChatContext {
     
     // Save loaded ChatRoom when realm has no updated data. different updated data.
     private func saveChatRoom(_ room: ChatRoom) {
-        let realm = userRealmManager.createRealm()
+        let realm = try! Realm()
         
         let realmRoom = realm.objects(RealmChatRoom.self).where { $0.id == room.id }.first
         
@@ -209,22 +205,7 @@ extension ChatContext {
         }
         
         try! realm.write {
-            let realmRoom = RealmChatRoom()
-            realmRoom.id = room.id
-            
-            let realmParticipants = room.participants.map { participant in
-                let realmParticipant = RealmParticipant()
-                realmParticipant.userId = participant.userId
-                realmParticipant.nick = participant.nick
-                realmParticipant.profileImage = participant.profileImage ?? ""
-                return realmParticipant
-            }
-            realmRoom.participants.append(objectsIn: realmParticipants)
-            
-            realmRoom.lastMessageId = room.lastMessage?.id ?? ""
-            realmRoom.unreadCount = room.unreadCount
-            realmRoom.createdAt = room.createdAt
-            realmRoom.updatedAt = room.updatedAt
+            let realmRoom = RealmChatRoom(from: room)
             
             realm.add(realmRoom, update: .modified) // update option works, when same primary key record exists
             
@@ -239,27 +220,12 @@ extension ChatContext {
     // saveMessageOnly is required when chatRoomUpdate happens firstly.
     // But when just message updated, corresponding chat room update is also required.
     private func saveMessageOnly(_ message: ChatMessage, in realm: Realm) {
-        let realmMessage = RealmChatMessage()
-        realmMessage.id = message.id
-        realmMessage.roomId = message.roomId
-        realmMessage.content = message.content
-        realmMessage.senderId = message.senderId
-        realmMessage.senderNick = message.senderNick
-        realmMessage.senderProfileImage = message.senderProfileImage ?? ""
-        
-        if let files = message.files {
-            realmMessage.files.append(objectsIn: files)
-        }
-        
-        realmMessage.createdAt = message.createdAt
-        realmMessage.isRead = message.isRead
-        realmMessage.isSent = message.isSent
-        
+        let realmMessage = RealmChatMessage(from: message)
         realm.add(realmMessage, update: .modified)
     }
     
     private func saveMessage(_ message: ChatMessage, shouldUpdateRoom: Bool = true) {
-        let realm = userRealmManager.createRealm()
+        let realm = try! Realm()
         
         try! realm.write {
             saveMessageOnly(message, in: realm)
@@ -278,7 +244,7 @@ extension ChatContext {
     }
     
     private func markMessagesAsRead(in roomId: String) {
-        let realm = userRealmManager.createRealm()
+        let realm = try! Realm()
         
         try! realm.write {
             let unreadMessages = realm.objects(RealmChatMessage.self)
@@ -295,7 +261,7 @@ extension ChatContext {
     }
     
     private func incrementUnreadCount(for roomId: String) {
-        let realm = userRealmManager.createRealm()
+        let realm = try! Realm()
         
         try! realm.write {
             if let room = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: roomId) {
@@ -305,7 +271,7 @@ extension ChatContext {
     }
     
     private func updateTotalUnreadCount() {
-        let realm = userRealmManager.createRealm()
+        let realm = try! Realm()
         
         let total: Int = realm.objects(RealmChatRoom.self).sum(ofProperty: "unreadCount")
         DispatchQueue.main.async {
@@ -340,7 +306,7 @@ extension ChatContext {
     }
     
     func deleteChatRoom(_ roomId: String) {
-        let realm = userRealmManager.createRealm()
+        let realm = try! Realm()
         
         try! realm.write {
             if let roomToDelete = realm.object(ofType: RealmChatRoom.self, forPrimaryKey: roomId) {
@@ -390,7 +356,8 @@ extension ChatContext {
             files: realmMessage.files.isEmpty ? nil : Array(realmMessage.files),
             createdAt: realmMessage.createdAt,
             isRead: realmMessage.isRead,
-            isSent: realmMessage.isSent
+            isSent: realmMessage.isSent,
+            isMyMessage:  realmMessage.senderId == RealmCurrentUser.getCurrentUserId()
         )
     }
 }

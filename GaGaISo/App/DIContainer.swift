@@ -28,8 +28,6 @@ class DIContainer: ObservableObject {
     
     let orderContext: OrderContext
     
-    let userRealmManager: UserRealmManager
-    
     let chatContext: ChatContext
     let chatService: ChatService
     
@@ -49,12 +47,9 @@ class DIContainer: ObservableObject {
         self.locationManager = locationManager
         self.kakaoUserApi = kakaoUserApi
         
-        self.userRealmManager = UserRealmManager()
-        
         self.authManager = AuthenticationManager(
             authStore: authStore,
-            networkClient: networkClient,
-            userRealmManager: userRealmManager
+            networkClient: networkClient
         )
         
         self.networkManager = StrategicNetworkHandler(client: networkClient, authManager: authManager)
@@ -64,7 +59,7 @@ class DIContainer: ObservableObject {
         self.orderContext = OrderContext()
         
         self.chatService = ChatService(networkManager: networkManager)
-        self.chatContext = ChatContext(chatService: chatService, userRealmManager: userRealmManager)
+        self.chatContext = ChatContext(chatService: chatService)
         
         self.communityService = CommunityService(networkManager: networkManager)
         self.communityContext = CommunityContext(communityService: communityService, locationManager: locationManager)
