@@ -8,11 +8,20 @@ import Foundation
 import Combine
 
 class CommunityViewModel: ObservableObject {
+    
     private let communityContext: CommunityContext
+    private let chatContext: ChatContext
+    
     private var cancellables = Set<AnyCancellable>()
     
     @Published var searchText = ""
     @Published var showingWritePost = false
+    
+    @Published var showChatRoom = false
+    @Published var isChatLoading = false
+    @Published var chatRoomId: String?
+    
+    @Published var chatErrorMessage: String?
     
     @Published var selectedDistance: Double = 300 {
         didSet {
@@ -38,8 +47,9 @@ class CommunityViewModel: ObservableObject {
         }
     }
     
-    init(communityContext: CommunityContext) {
+    init(communityContext: CommunityContext, chatContext: ChatContext) {
         self.communityContext = communityContext
+        self.chatContext = chatContext
         setupObservers()
     }
     
@@ -116,5 +126,32 @@ class CommunityViewModel: ObservableObject {
     
     func updateCategory(_ category: String) {
         selectedCategory = category
+    }
+}
+
+
+extension CommunityViewModel {
+    func startChatWithOwner(userId: String) {
+        Task {
+            await MainActor.run {
+                isChatLoading = true
+                chatErrorMessage = nil
+            }
+            
+            if let chatRoom = await chatContext.createOrGetChatRoom(with: userId) {
+                print("chatRoomnumber came: \(chatRoom)")
+                
+                await MainActor.run {
+                    self.chatRoomId = chatRoom.id
+                    self.showChatRoom = true
+                    self.isChatLoading = false
+                }
+            } else {
+                await MainActor.run {
+                    self.chatErrorMessage = "채팅방 생성에 실패했습니다."
+                    self.isChatLoading = false
+                }
+            }
+        }
     }
 }

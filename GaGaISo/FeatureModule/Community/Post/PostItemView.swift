@@ -11,8 +11,11 @@ struct PostItemView: View {
     @Environment(\.diContainer) private var diContainer
     @StateObject var viewModel: PostItemViewModel
     
-    init(viewModel: PostItemViewModel) {
+    var startChat: (String) -> Void
+    
+    init(viewModel: PostItemViewModel, startChat: @escaping (String) -> Void ){
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.startChat = startChat
     }
     
     var body: some View {
@@ -24,7 +27,7 @@ struct PostItemView: View {
             }
             
             contentSection
-        
+            
             statsSection
             
             if viewModel.hasStore {
@@ -43,14 +46,18 @@ struct PostItemView: View {
     
     private var authorSection: some View {
         HStack(spacing: 8) {
-            Circle()
-                .fill(Color.gray15)
-                .frame(width: 32, height: 32)
-                .overlay(
-                    Image(systemName: "person.fill")
-                        .foregroundColor(.gray60)
-                        .font(.caption)
-                )
+            Button {
+                startChat(viewModel.userId)
+            } label : {
+                Circle()
+                    .fill(Color.gray15)
+                    .frame(width: 32, height: 32)
+                    .overlay(
+                        Image(systemName: "person.fill")
+                            .foregroundColor(.gray60)
+                            .font(.caption)
+                    )
+            }
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(viewModel.authorName)

@@ -102,6 +102,10 @@ extension PostItemViewModel {
         post?.creator.nick ?? "알 수 없음"
     }
     
+    var userId : String {
+        post?.creator.userID ?? ""
+    }
+    
     var isLiked: Bool {
         post?.isLike ?? false
     }

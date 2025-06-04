@@ -21,7 +21,7 @@ struct CommunityView: View {
                 searchAndWriteSection
                     .padding(.horizontal, 16)
                     .padding(.bottom, 12)
-
+                
                 distanceSliderSection
                     .padding(.horizontal, 16)
                     .padding(.bottom, 16)
@@ -34,7 +34,10 @@ struct CommunityView: View {
                     LazyVStack(spacing: 16) {
                         ForEach(viewModel.postIds, id: \.self) { postId in
                             PostItemView(
-                                viewModel: diContainer.getPostItemViewModel(postId: postId)
+                                viewModel: diContainer.getPostItemViewModel(postId: postId),
+                                startChat: { userId in
+                                    viewModel.startChatWithOwner(userId: userId)
+                                }
                             )
                         }
                         
@@ -70,6 +73,16 @@ struct CommunityView: View {
             .background(Color.gray15.ignoresSafeArea())
             .sheet(isPresented: $viewModel.showingWritePost) {
                 Text("글쓰기 화면") // 임시
+            }
+            .sheet(isPresented: $viewModel.showChatRoom) {
+                if let roomId = viewModel.chatRoomId {
+                    ChatRoomView(
+                        viewModel: diContainer.getChatRoomViewModel(roomId: roomId)
+                    )
+                } else {
+                    ProgressView("채팅방을 준비하는 중...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             }
             .alert("오류", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("확인") {
@@ -158,7 +171,7 @@ struct CommunityView: View {
             }
         }
     }
-
+    
     private var titleAndFilterSection: some View {
         HStack {
             Text("타임라인")

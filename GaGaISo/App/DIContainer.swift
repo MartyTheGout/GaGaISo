@@ -142,7 +142,7 @@ class DIContainer: ObservableObject {
     }
     
     func getCommunityViewModel() -> CommunityViewModel {
-        CommunityViewModel(communityContext: communityContext)
+        CommunityViewModel(communityContext: communityContext, chatContext: chatContext)
     }
     
     func getPostItemViewModel(postId: String) -> PostItemViewModel {
