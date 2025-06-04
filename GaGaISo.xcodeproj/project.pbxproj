@@ -56,22 +56,6 @@
 			);
 			target = 407D26702DD32AE90043F141 /* GaGaISo */;
 		};
-		4081384E2DDB1327001F3C10 /* Exceptions for "GaGaISoTests" folder in "GaGaISo" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Mocks/MockAuthManager.swift,
-				Mocks/MockKakaoAPI.swift,
-			);
-			target = 407D26702DD32AE90043F141 /* GaGaISo */;
-		};
-		4081384F2DDB1327001F3C10 /* Exceptions for "GaGaISoTests" folder in "GaGaISoTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Mocks/MockAuthManager.swift,
-				Mocks/MockKakaoAPI.swift,
-			);
-			target = 408138412DDB11F5001F3C10 /* GaGaISoTests */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -81,15 +65,6 @@
 				407D27732DD359ED0043F141 /* Exceptions for "GaGaISo" folder in "GaGaISo" target */,
 			);
 			path = GaGaISo;
-			sourceTree = "<group>";
-		};
-		408138432DDB11F5001F3C10 /* GaGaISoTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				4081384E2DDB1327001F3C10 /* Exceptions for "GaGaISoTests" folder in "GaGaISo" target */,
-				4081384F2DDB1327001F3C10 /* Exceptions for "GaGaISoTests" folder in "GaGaISoTests" target */,
-			);
-			path = GaGaISoTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -124,7 +99,6 @@
 			children = (
 				407D26822DD32B100043F141 /* .gitignore */,
 				407D26732DD32AE90043F141 /* GaGaISo */,
-				408138432DDB11F5001F3C10 /* GaGaISoTests */,
 				40C05BC32DDAF8250012671F /* Frameworks */,
 				407D26722DD32AE90043F141 /* Products */,
 			);
@@ -191,9 +165,6 @@
 			);
 			dependencies = (
 				408138472DDB11F5001F3C10 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				408138432DDB11F5001F3C10 /* GaGaISoTests */,
 			);
 			name = GaGaISoTests;
 			packageProductDependencies = (
