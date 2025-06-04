@@ -15,7 +15,7 @@ struct GaGaISoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     let diContainer = DIContainer()
     
-    @StateObject private var navigationManager = AppNavigationManager.shared
+    private var navigationManager = AppNavigationManager.shared
     
     //testMode
     var forceLoginProcess = false
