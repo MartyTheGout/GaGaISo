@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PopularStoreView: View {
     @Environment(\.diContainer) private var diContainer
-    @EnvironmentObject private var navigationManager: AppNavigationManager
+    private let navigationManager = AppNavigationManager.shared
     
     @StateObject private var viewModel: PopularStoreViewModel
     

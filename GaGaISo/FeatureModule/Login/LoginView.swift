@@ -11,7 +11,7 @@ import Toasts
 struct LoginView: View {
     @Environment(\.presentToast) private var presentToast
     @Environment(\.diContainer) private var diContainer
-    @EnvironmentObject private var navigationManager: AppNavigationManager
+    private let navigationManager = AppNavigationManager.shared
     
     @StateObject private var viewModel: LoginViewModel
     

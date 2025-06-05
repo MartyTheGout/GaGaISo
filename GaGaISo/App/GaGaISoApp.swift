@@ -15,7 +15,7 @@ struct GaGaISoApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     let diContainer = DIContainer()
     
-    private var navigationManager = AppNavigationManager()
+    private let navigationManager = AppNavigationManager.shared
     
     //testMode
     var forceLoginProcess = false
@@ -43,7 +43,6 @@ struct GaGaISoApp: App {
         WindowGroup {
             AppEntryView(viewModel: diContainer.getEntryViewModel())
                 .environment(\.diContainer, diContainer)
-                .environmentObject(navigationManager)
                 .onOpenURL(perform: { url in
                     if AuthApi.isKakaoTalkLoginUrl(url) {
                         _ = AuthController.handleOpenUrl(url: url)

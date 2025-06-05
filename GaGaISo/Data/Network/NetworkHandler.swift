@@ -63,10 +63,10 @@ final class StrategicNetworkHandler {
         let request = route.createRequest(withToken: authManager.getAccessToken())
         let result: Result<T, APIError> = await client.request(request, responseType: T.self)
         
-        print("===========================================")
-        dump(request)
-        dump(result)
-        print("===========================================")
+//        print("===========================================")
+//        dump(request)
+//        dump(result)
+//        print("===========================================")
         
         // Single retry after token refresh (no exponential backoff)
         if case .failure(let error) = result,

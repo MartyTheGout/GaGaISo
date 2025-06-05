@@ -11,13 +11,17 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.diContainer) private var diContainer
-    @EnvironmentObject private var navigationManager: AppNavigationManager
+    private let navigationManager = AppNavigationManager.shared
     
-    @State private var testtab : AppTab = .home
+    @State private var selectedTab: AppTab = .home
+    @State private var homeNavigationPath = NavigationPath()
+    @State private var ordersNavigationPath = NavigationPath()
+    @State private var profileNavigationPath = NavigationPath()
+    @State private var communityNavigationPath = NavigationPath()
     
     var body: some View {
-        TabView(selection:$navigationManager.selectedTab) {
-            NavigationStack(path: $navigationManager.homeNavigationPath) {
+        TabView(selection:$selectedTab) {
+            NavigationStack(path: $homeNavigationPath) {
                 HomeView(viewModel: diContainer.getHomeViewModel())
                     .navigationDestination(for: AppDestination.self) { destination in
                         destinationView(for: destination)
@@ -28,7 +32,7 @@ struct ContentView: View {
             }
             .tag(AppTab.home)
             
-            NavigationStack(path: $navigationManager.ordersNavigationPath) {
+            NavigationStack(path: $ordersNavigationPath) {
                 OrdersView()
                     .navigationDestination(for: AppDestination.self) { destination in
                         destinationView(for: destination)
@@ -39,7 +43,7 @@ struct ContentView: View {
             }
             .tag(AppTab.orders)
             
-            NavigationStack(path: $navigationManager.communityNavigationPath) {
+            NavigationStack(path: $communityNavigationPath) {
                 CommunityView(viewModel: diContainer.getCommunityViewModel())
                     .navigationDestination(for: AppDestination.self) { destination in
                         destinationView(for: destination)
@@ -50,7 +54,7 @@ struct ContentView: View {
             }
             .tag(AppTab.community)
             
-            NavigationStack(path: $navigationManager.profileNavigationPath ) {
+            NavigationStack(path: $profileNavigationPath ) {
                 ProfileView()
                     .navigationDestination(for: AppDestination.self) { destination in
                         destinationView(for: destination)
@@ -63,6 +67,21 @@ struct ContentView: View {
         }
         .onAppear {
             setupTabBarAppearance()
+        }
+        .onReceive(navigationManager.$selectedTab) { newTab in
+            selectedTab = newTab
+        }
+        .onReceive(navigationManager.$homeNavigationPath) { newPath in
+            homeNavigationPath = newPath
+        }
+        .onReceive(navigationManager.$ordersNavigationPath) { newPath in
+            ordersNavigationPath = newPath
+        }
+        .onReceive(navigationManager.$communityNavigationPath) { newPath in
+            communityNavigationPath = newPath
+        }
+        .onReceive(navigationManager.$profileNavigationPath) { newPath in
+            profileNavigationPath = newPath
         }
     }
     

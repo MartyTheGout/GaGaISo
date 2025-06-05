@@ -9,7 +9,7 @@ import SwiftUI
 struct StoreListView: View {
     @Environment(\.diContainer) private var diContainer
 
-    @EnvironmentObject private var navigationManager: AppNavigationManager
+    private let navigationManager = AppNavigationManager.shared
     
     @StateObject var viewModel : StoreListViewModel
     

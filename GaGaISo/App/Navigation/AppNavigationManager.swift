@@ -8,7 +8,7 @@ import SwiftUI
 import Combine
 
 class AppNavigationManager: ObservableObject {
-//    static let shared = AppNavigationManager()
+    static let shared = AppNavigationManager()
     
     @Published var selectedTab: AppTab = .home
     @Published var pendingDestination: AppDestination?
@@ -20,7 +20,7 @@ class AppNavigationManager: ObservableObject {
     
     var pendingDeepLink: URL?
     
-//    private init() {}
+    private init() {}
     
     //MARK: - 로그인 완료 후 pending deep link 처리
     func processPendingDeepLink() {
