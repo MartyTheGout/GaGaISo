@@ -11,10 +11,12 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.diContainer) private var diContainer
-    @StateObject private var navigationManager = AppNavigationManager.shared
+    @EnvironmentObject private var navigationManager: AppNavigationManager
+    
+    @State private var testtab : AppTab = .home
     
     var body: some View {
-        TabView(selection: $navigationManager.selectedTab) {
+        TabView(selection:$navigationManager.selectedTab) {
             NavigationStack(path: $navigationManager.homeNavigationPath) {
                 HomeView(viewModel: diContainer.getHomeViewModel())
                     .navigationDestination(for: AppDestination.self) { destination in
@@ -48,7 +50,7 @@ struct ContentView: View {
             }
             .tag(AppTab.community)
             
-            NavigationStack(path: $navigationManager.profileNavigationPath) {
+            NavigationStack(path: $navigationManager.profileNavigationPath ) {
                 ProfileView()
                     .navigationDestination(for: AppDestination.self) { destination in
                         destinationView(for: destination)

@@ -8,7 +8,7 @@ import SwiftUI
 import Combine
 
 class AppNavigationManager: ObservableObject {
-    static let shared = AppNavigationManager()
+//    static let shared = AppNavigationManager()
     
     @Published var selectedTab: AppTab = .home
     @Published var pendingDestination: AppDestination?
@@ -20,7 +20,7 @@ class AppNavigationManager: ObservableObject {
     
     var pendingDeepLink: URL?
     
-    private init() {}
+//    private init() {}
     
     //MARK: - 로그인 완료 후 pending deep link 처리
     func processPendingDeepLink() {
@@ -30,7 +30,7 @@ class AppNavigationManager: ObservableObject {
         }
     }
     
-    // MARK: - 전역 네비게이션 메서드
+    // MARK: - Navigation
     func navigate(to destination: AppDestination) {
         print("🧭 Navigating to: \(destination)")
         
@@ -68,7 +68,7 @@ class AppNavigationManager: ObservableObject {
         }
     }
     
-    // MARK: - 패스 클리어 메서드들
+    // MARK: - Path Clearance
     private func clearAllPaths() {
         homeNavigationPath = NavigationPath()
         ordersNavigationPath = NavigationPath()
@@ -89,7 +89,7 @@ class AppNavigationManager: ObservableObject {
         navigate(to: .orderStatus(orderId: orderId))
     }
     
-    // MARK: - Push Notification 처리
+    // MARK: - Push Notification Handling
     func handlePushNotification(userInfo: [AnyHashable: Any]) {
         // Push notification의 payload를 파싱하여 적절한 destination으로 이동
         
@@ -109,7 +109,7 @@ class AppNavigationManager: ObservableObject {
         }
     }
     
-    // MARK: - Deep Link 처리
+    // MARK: - Deep Link Handling
     func handleDeepLink(url: URL) {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         guard let host = components?.host else { return }

@@ -13,6 +13,7 @@ struct AppEntryView: View {
     
     init(viewModel: AppEntryViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        print("EntryView" + #function)
     }
     
     var body: some View {

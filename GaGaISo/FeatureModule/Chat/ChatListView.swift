@@ -13,6 +13,7 @@ struct ChatListView: View {
     
     init(viewModel: ChatListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        print("ChatListView" + #function)
     }
     
     var body: some View {

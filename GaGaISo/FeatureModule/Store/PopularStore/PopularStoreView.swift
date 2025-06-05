@@ -9,12 +9,13 @@ import SwiftUI
 
 struct PopularStoreView: View {
     @Environment(\.diContainer) private var diContainer
-    @StateObject private var navigationManager = AppNavigationManager.shared
+    @EnvironmentObject private var navigationManager: AppNavigationManager
     
     @StateObject private var viewModel: PopularStoreViewModel
     
     init(viewModel: PopularStoreViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        print("PopularStoreView init")
     }
     
     var body: some View {
