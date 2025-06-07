@@ -15,6 +15,8 @@ class MenuDetailViewModel: ObservableObject {
     private let imageContext: ImageContext
     private let orderContext: OrderContext
     
+    private var cancellable = Set<AnyCancellable>()
+    
     @Published var menuImage: UIImage?
     @Published var isImageLoading: Bool = false
     @Published var quantity: Int = 1
@@ -43,6 +45,16 @@ class MenuDetailViewModel: ObservableObject {
                 self.isImageLoading = false
             }
         }
+    }
+    
+    func observeOrderContext() {
+        orderContext.$orderItems
+            .sink { [weak self] value in
+                if let validOrderItem = value.filter({ $0.id == self?.menu.menuID}).first {
+                    self?.quantity = validOrderItem.quantity
+                }
+            }
+            .store(in: &cancellable)
     }
     
     func increaseQuantity() {

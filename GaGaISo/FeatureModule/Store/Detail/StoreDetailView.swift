@@ -15,6 +15,8 @@ struct StoreDetailView: View {
     @State private var currentImageIndex = 0
     @State private var selectedMenuCategory = "전체"
     
+    @State private var hasOrderItem = false
+    
     init(viewModel: StoreDetailViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -66,11 +68,21 @@ struct StoreDetailView: View {
                 
                 Spacer()
             }
+            
+            if hasOrderItem {
+                VStack {
+                    Spacer()
+                    OrderView(viewModel: diContainer.getOrderViewModel())
+                }
+                .ignoresSafeArea(.container, edges: .bottom)
+            }
         }
         .navigationBarHidden(true)
+        .toolbar(.hidden, for: .tabBar)
         .onAppear {
             Task {
                 await viewModel.loadStoreDetail()
+                viewModel.setOrderWithCurrentStore()
             }
         }
         .sheet(isPresented: $viewModel.showChatRoom) {
@@ -82,6 +94,9 @@ struct StoreDetailView: View {
                 ProgressView("채팅방을 준비하는 중...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+        }
+        .onReceive(viewModel.orderContext.$orderItems) { items in
+            hasOrderItem = viewModel.orderContext.hasItems
         }
     }
     

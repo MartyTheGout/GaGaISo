@@ -16,8 +16,11 @@ class StoreDetailViewModel: ObservableObject {
     private let storeService: StoreService
     private let imageContext: ImageContext
     private let chatContext: ChatContext
-
+    let orderContext: OrderContext
+    
     private var cancellables = Set<AnyCancellable>()
+    
+    @Published var currentOrder: [OrderItem] = []
     
     @Published var storeImages: [UIImage] = []
     @Published var isImageLoading: Bool = false
@@ -35,11 +38,12 @@ class StoreDetailViewModel: ObservableObject {
         }
     }
     
-    init(storeId: String, storeService: StoreService, imageContext: ImageContext, chatContext: ChatContext) {
+    init(storeId: String, storeService: StoreService, imageContext: ImageContext, chatContext: ChatContext, orderContext: OrderContext) {
         self.storeId = storeId
         self.storeService = storeService
         self.imageContext = imageContext
         self.chatContext = chatContext
+        self.orderContext = orderContext
     }
     
     func loadStoreDetail() async {
@@ -141,6 +145,28 @@ class StoreDetailViewModel: ObservableObject {
     }
 }
 
+//MARK: Order
+extension StoreDetailViewModel {
+    // MARK: need to consider if it is required.
+    //    func loadCurrentOrder() {
+    //        orderContext.$orderItems
+    //            .sink { [weak self] orderItems in
+    //            self?.currentOrder = orderItems
+    //            }
+    //            .store(in: &cancellables)
+    //    }
+    
+    func setOrderWithCurrentStore() {
+        if let storeDetail {
+            orderContext.startNewOrder(
+                storeId: storeDetail.storeID,
+                storeName: storeDetail.name
+            )
+        }
+    }
+}
+
+//MARK: Presentation
 extension StoreDetailViewModel {
     var hasStore: Bool {
         storeDetail != nil
