@@ -39,6 +39,18 @@ class OrderViewModel: ObservableObject {
         orderContext.hasItems
     }
     
+    var isProcessingPayment: Bool {
+        orderContext.isProcessingPayment
+    }
+    
+    var showPaymentSheet: Bool {
+        orderContext.showPaymentSheet
+    }
+    
+    var currentOrderCode: String? {
+        orderContext.currentOrderCode
+    }
+    
     // MARK: - Actions
     func increaseQuantity(for item: OrderItem) {
         orderContext.changeOrderItemQuantity(menuId: item.id, quantity: 1)
@@ -54,5 +66,31 @@ class OrderViewModel: ObservableObject {
     
     func clearAllItems() {
         orderContext.clearOrder()
+    }
+}
+
+extension OrderViewModel {
+    func startPayment() {
+        Task {
+            let result = await orderContext.makeOrder()
+            
+            await MainActor.run {
+                switch result {
+                case .success:
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        self.orderContext.showPaymentSheet = true
+                    }
+                    
+                case .failure(let error):
+                    // 토스트로 에러 표시
+                    dump(error)
+                    print("주문 생성 실패: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    func handlePaymentCompletion(success: Bool) {
+        orderContext.handlePaymentCompletion(success: success)
     }
 }

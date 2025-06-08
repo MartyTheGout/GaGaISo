@@ -8,7 +8,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kakao${KAKAO_NATIVE_APP_KEY}</string>
-				<string>App Scheme</string>
+				<string>gagaiso</string>
 			</array>
 		</dict>
 	</array>

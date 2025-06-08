@@ -56,7 +56,6 @@ struct GaGaISoApp: App {
     
     private func handleDeepLink(url: URL) {
         if diContainer.authManager.isLoggedIn {
-            // 로그인된 상태면 메인 앱 네비게이터로 처리
             navigationManager.handleDeepLink(url: url)
         } else {
             navigationManager.pendingDeepLink = url

@@ -127,4 +127,19 @@ class AppNavigationManager: ObservableObject {
             navigate(to: .home)
         }
     }
+    //MARK: check later
+    private func handlePaymentURL(url: URL) {
+        print("💳 Payment URL Received: \(url.absoluteString)")
+        
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let queryItems = components.queryItems else {
+            print("❌ Invalid payment URL format")
+            return
+        }
+        
+        print("📋 Payment URL Parameters:")
+        for item in queryItems {
+            print("  - \(item.name): \(item.value ?? "nil")")
+        }
+    }
 }

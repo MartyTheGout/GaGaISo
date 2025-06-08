@@ -35,13 +35,38 @@ struct CompletedOrder {
     let createdAt: Date
 }
 
+enum OrderError: Error, LocalizedError {
+    case invalidOrderData
+    case paymentFailed
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidOrderData:
+            return "주문 정보가 올바르지 않습니다."
+        case .paymentFailed:
+            return "결제 처리 중 오류가 발생했습니다."
+        }
+    }
+}
+
 class OrderContext: ObservableObject {
+    
+    private let networkManager: StrategicNetworkHandler
     
     @Published private var completedOrders: [String: CompletedOrder] = [:]
     
     @Published private(set) var orderItems: [OrderItem] = []
     @Published private(set) var storeId: String?
     @Published private(set) var storeName: String?
+    
+    // Payment Related
+    @Published var isProcessingPayment: Bool = false
+    @Published var showPaymentSheet: Bool = false
+    @Published var currentOrderCode: String?
+    
+    init(networkManager: StrategicNetworkHandler) {
+        self.networkManager = networkManager
+    }
     
     var totalItemCount: Int {
         orderItems.reduce(0) { $0 + $1.quantity }
@@ -83,7 +108,7 @@ class OrderContext: ObservableObject {
         }
         
         dump(orderItems)
-
+        
     }
     
     func changeOrderItemQuantity(menuId: String, quantity: Int) {
@@ -109,5 +134,55 @@ class OrderContext: ObservableObject {
         orderItems.removeAll()
         storeId = nil
         storeName = nil
+    }
+}
+
+//MARK: - Payment
+extension OrderContext {
+    func makeOrder() async -> Result<String, Error> {
+        guard let storeId = storeId, !orderItems.isEmpty else {
+            return .failure(OrderError.invalidOrderData)
+        }
+        
+        await MainActor.run {
+            isProcessingPayment = true
+        }
+        
+        let orderMenuList = orderItems.map { item in
+            OrderMenuItem(menuId: item.id, quantity: item.quantity)
+        }
+        
+        let orderRequest = PostOrderRequestDTO(
+            storeId: storeId,
+            orderMenuList: orderMenuList,
+            totalPrice: totalPrice
+        )
+        
+        let result = await networkManager.request(
+            OrderRouter.v1PostOrder(orderDetail: orderRequest),
+            type: OrderPostResultDTO.self
+        )
+        
+        await MainActor.run {
+            isProcessingPayment = false
+            
+            switch result {
+            case .success(let orderResult):
+                self.currentOrderCode = orderResult.orderCode
+                self.showPaymentSheet = true
+            case .failure:
+                break
+            }
+        }
+        
+        return result.map {$0.orderCode}.mapError { $0 as Error }
+    }
+    
+    func handlePaymentCompletion(success: Bool) {
+        showPaymentSheet = false
+        
+        if success {
+            clearOrder()
+        }
     }
 }

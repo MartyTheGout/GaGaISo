@@ -56,7 +56,7 @@ class DIContainer: ObservableObject {
         self.storeService = StoreService(networkManager: networkManager)
         self.storeContext = StoreContext(storeService: storeService)
         self.imageContext = ImageContext(authManager: authManager)
-        self.orderContext = OrderContext()
+        self.orderContext = OrderContext(networkManager: networkManager)
         
         self.chatService = ChatService(networkManager: networkManager)
         self.chatContext = ChatContext(chatService: chatService)
