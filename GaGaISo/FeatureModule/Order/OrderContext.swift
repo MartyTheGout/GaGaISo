@@ -180,6 +180,7 @@ extension OrderContext {
     
     func handlePaymentCompletion(success: Bool) {
         showPaymentSheet = false
+        currentOrderCode = nil
         
         if success {
             clearOrder()

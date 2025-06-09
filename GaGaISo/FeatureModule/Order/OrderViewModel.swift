@@ -6,12 +6,29 @@
 //
 
 import Foundation
+import Combine
 
 class OrderViewModel: ObservableObject {
     private let orderContext: OrderContext
     
+    @Published var showPaymentSheet: Bool = false
+    @Published var isProcessingPayment: Bool = false
+    @Published var currentOrderCode: String?
+    
     init(orderContext: OrderContext) {
         self.orderContext = orderContext
+        setupBindings()
+    }
+    
+    private func setupBindings() {
+        orderContext.$showPaymentSheet
+            .assign(to: &$showPaymentSheet) // cancellable 이 없다 이래도 되는것인가?
+        
+        orderContext.$isProcessingPayment
+            .assign(to: &$isProcessingPayment)
+        
+        orderContext.$currentOrderCode
+            .assign(to: &$currentOrderCode)
     }
     
     // MARK: - Published Properties
@@ -37,18 +54,6 @@ class OrderViewModel: ObservableObject {
     
     var hasItems: Bool {
         orderContext.hasItems
-    }
-    
-    var isProcessingPayment: Bool {
-        orderContext.isProcessingPayment
-    }
-    
-    var showPaymentSheet: Bool {
-        orderContext.showPaymentSheet
-    }
-    
-    var currentOrderCode: String? {
-        orderContext.currentOrderCode
     }
     
     // MARK: - Actions
@@ -77,12 +82,8 @@ extension OrderViewModel {
             await MainActor.run {
                 switch result {
                 case .success:
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        self.orderContext.showPaymentSheet = true
-                    }
-                    
+                    break
                 case .failure(let error):
-                    // 토스트로 에러 표시
                     dump(error)
                     print("주문 생성 실패: \(error.localizedDescription)")
                 }

@@ -49,7 +49,6 @@ class IamportPaymentViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        // 로딩 인디케이터 추가
         let activityIndicator = UIActivityIndicatorView(style: .large)
         activityIndicator.translatesAutoresizingMaskIntoConstraints = false
         activityIndicator.startAnimating()
@@ -74,6 +73,7 @@ class IamportPaymentViewController: UIViewController {
             DispatchQueue.main.async {
                 if let response = response {
                     let isSuccess = response.success ?? false
+                    print("imp_uid: \(response.imp_uid)")
                     self?.onCompletion?(isSuccess)
                 } else {
                     self?.onCompletion?(false)
@@ -85,11 +85,11 @@ class IamportPaymentViewController: UIViewController {
     // 아임포트 결제 데이터 생성
     func createPaymentData() -> IamportPayment {
         return IamportPayment(
-            pg: PG.html5_inicis.makePgRawName(pgId: ""),
+            pg: PG.html5_inicis.makePgRawName(pgId: "INIpayTest"),
             merchant_uid: orderCode, // 서버에서 받은 orderCode 사용
             amount: "\(totalPrice)"
         ).then {
-            $0.pay_method = "card"
+            $0.pay_method = PayMethod.card.rawValue
             $0.name = "\(storeName) 주문"
             $0.buyer_name = "가가이소 사용자"
             $0.app_scheme = "gagaiso" // Info.plist의 URL Scheme과 일치해야 함

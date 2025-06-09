@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import Combine
+import iamport_ios
 
 class AppNavigationManager: ObservableObject {
     static let shared = AppNavigationManager()
@@ -114,6 +115,13 @@ class AppNavigationManager: ObservableObject {
         let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         guard let host = components?.host else { return }
         
+        // For PG Payment Link
+        if url.scheme == "gagaiso" {
+            Iamport.shared.receivedURL(url)
+            return
+        }
+        
+        // For Serverside push
         switch host {
         case "store":
             if let storeId = components?.queryItems?.first(where: { $0.name == "id" })?.value {
@@ -125,21 +133,6 @@ class AppNavigationManager: ObservableObject {
             }
         default:
             navigate(to: .home)
-        }
-    }
-    //MARK: check later
-    private func handlePaymentURL(url: URL) {
-        print("💳 Payment URL Received: \(url.absoluteString)")
-        
-        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let queryItems = components.queryItems else {
-            print("❌ Invalid payment URL format")
-            return
-        }
-        
-        print("📋 Payment URL Parameters:")
-        for item in queryItems {
-            print("  - \(item.name): \(item.value ?? "nil")")
         }
     }
 }

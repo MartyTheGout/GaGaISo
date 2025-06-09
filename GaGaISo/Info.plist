@@ -11,6 +11,14 @@
 				<string>gagaiso</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>gagaiso</string>
+			</array>
+		</dict>
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
@@ -56,11 +64,8 @@
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
+        <key>NSAllowsArbitraryLoads</key>
 		<true/>
-<!--   For only WebContent     -->
-<!--		<key>NSAllowsArbitraryLoadsInWebContent</key>-->
-<!--		<true/>-->
 	</dict>
 	<key>UIAppFonts</key>
 	<array>

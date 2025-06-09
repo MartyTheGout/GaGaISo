@@ -102,27 +102,24 @@ struct OrderView: View {
                 }
         )
         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isExpanded)
-        .sheet(isPresented: Binding(
-                    get: { viewModel.showPaymentSheet },
-                    set: { _ in }
-                )) {
-                    if let orderCode = viewModel.currentOrderCode {
-                        IamportPaymentView(
-                            orderCode: orderCode,
-                            totalPrice: viewModel.totalPrice,
-                            storeName: viewModel.storeName
-                        ) { success in
-                            viewModel.handlePaymentCompletion(success: success)
-                            
-                            let toast = ToastValue(
-                                icon: Image(systemName: success ? "checkmark.circle" : "xmark.circle"),
-                                message: success ? "결제가 완료되었습니다!" : "결제가 취소되었습니다.",
-                                duration: 3.0
-                            )
-                            presentToast(toast)
-                        }
-                    }
+        .sheet(isPresented: $viewModel.showPaymentSheet) {
+            if let orderCode = viewModel.currentOrderCode {
+                IamportPaymentView(
+                    orderCode: orderCode,
+                    totalPrice: viewModel.totalPrice,
+                    storeName: viewModel.storeName
+                ) { success in
+                    viewModel.handlePaymentCompletion(success: success)
+                    
+                    let toast = ToastValue(
+                        icon: Image(systemName: success ? "checkmark.circle" : "xmark.circle"),
+                        message: success ? "결제가 완료되었습니다!" : "결제가 취소되었습니다.",
+                        duration: 3.0
+                    )
+                    presentToast(toast)
                 }
+            }
+        }
     }
     
     // MARK: - Drag Indicator
