@@ -13,7 +13,6 @@ struct HomeView: View {
     
     init(viewModel: HomeViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
-        print("HomeView" + #function)
     }
     
     var body: some View {

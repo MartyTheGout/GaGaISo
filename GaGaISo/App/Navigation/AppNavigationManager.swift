@@ -46,6 +46,27 @@ class AppNavigationManager: ObservableObject {
         }
     }
     
+    func popBack() {
+        switch selectedTab {
+        case .home:
+            if !homeNavigationPath.isEmpty {
+                homeNavigationPath.removeLast()
+            }
+        case .orders:
+            if !ordersNavigationPath.isEmpty {
+                ordersNavigationPath.removeLast()
+            }
+        case .community:
+            if !communityNavigationPath.isEmpty {
+                communityNavigationPath.removeLast()
+            }
+        case .profile:
+            if !profileNavigationPath.isEmpty {
+                profileNavigationPath.removeLast()
+            }
+        }
+    }
+    
     private func performInternalNavigation(to destination: AppDestination) {
         switch destination {
         case .home:

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StoreDetailView: View {
     @StateObject var viewModel: StoreDetailViewModel
-    @Environment(\.presentationMode) var presentationMode
+    private let navigationManager = AppNavigationManager.shared
     @Environment(\.diContainer) var diContainer
     
     @State private var currentImageIndex = 0
@@ -38,7 +38,7 @@ struct StoreDetailView: View {
             VStack {
                 HStack {
                     Button(action: {
-                        presentationMode.wrappedValue.dismiss()
+                        navigationManager.popBack()
                     }) {
                         Image(systemName: "chevron.left")
                             .font(.title2)
@@ -99,44 +99,7 @@ struct StoreDetailView: View {
             hasOrderItem = viewModel.orderContext.hasItems
         }
     }
-    
-    // MARK: - 커스텀 네비게이션 바
-    private var customNavigationBar: some View {
-        VStack {
-            HStack {
-                Button(action: {
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    Image(systemName: "chevron.left")
-                        .font(.title2)
-                        .foregroundColor(.gray0)
-                        .padding(8)
-                        .background(Color.black.opacity(0.3))
-                        .clipShape(Circle())
-                }
-                
-                Spacer()
-                
-                Button(action: {
-                    Task {
-                        await viewModel.toggleLike(for: viewModel.storeId)
-                    }
-                }) {
-                    Image(systemName: viewModel.isPick ? "heart.fill" : "heart")
-                        .font(.title2)
-                        .foregroundColor(viewModel.isPick ? .red : .gray0)
-                        .padding(8)
-                        .background(Color.black.opacity(0.3))
-                        .clipShape(Circle())
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top, 50)
-            
-            Spacer()
-        }
-    }
-    
+        
     // MARK: - 이미지 슬라이더 섹션
     private var imageSliderSection: some View {
         ZStack(alignment: .bottom) {
