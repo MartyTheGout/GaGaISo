@@ -18,7 +18,7 @@ enum OrderStatus: String {
 }
 
 enum OrderRouter: RouterProtocol {
-    case v1GetOrder(resourcePath: String)
+    case v1GetOrder
     case v1PostOrder(orderDetail: PostOrderRequestDTO)
     case v1PutOrderStatus(orderCode: String, status: OrderStatus)
     case v1PostPayment(importId: String)

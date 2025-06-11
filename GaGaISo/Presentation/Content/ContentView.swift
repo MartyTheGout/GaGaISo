@@ -33,7 +33,7 @@ struct ContentView: View {
             .tag(AppTab.home)
             
             NavigationStack(path: $ordersNavigationPath) {
-                OrdersView()
+                OrdersView(viewModel: diContainer.getOrdersViewModel())
                     .navigationDestination(for: AppDestination.self) { destination in
                         destinationView(for: destination)
                     }
@@ -92,8 +92,9 @@ struct ContentView: View {
             StoreDetailView(
                 viewModel: diContainer.getStoreDetailViewModel(storeId: storeId)
             )
-        case .orderStatus(let orderId):
-            OrdersView()
+            //        case .orderStatus(let orderId):
+            //            OrdersView()
+            
         case .memuDetail(let menu):
             MenuDetailView(viewModel: diContainer.getMenuDetailViewModel(menu: menu))
         default:

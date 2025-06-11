@@ -7,7 +7,6 @@
 
 import Foundation
 
-
 protocol RouterProtocol {
     var baseURL: URL { get }
     var path: String { get }

@@ -147,4 +147,12 @@ class DIContainer: ObservableObject {
     func getOrderViewModel() -> OrderViewModel {
         OrderViewModel(orderContext: orderContext)
     }
+    
+    func getOrdersViewModel() -> OrdersViewModel {
+        OrdersViewModel(orderContext: orderContext)
+    }
+    
+    func getOrderCardViewModel(order: OrderDetailDTO) -> OrderCardViewModel {
+        OrderCardViewModel(order: order, imageContext: imageContext)
+    }
 }

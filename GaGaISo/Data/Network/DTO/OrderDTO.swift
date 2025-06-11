@@ -38,7 +38,7 @@ struct OrderDetailsDTO: Codable {
 struct OrderDetailDTO: Codable {
     let orderID, orderCode: String
     let totalPrice: Int
-    let review: Review
+    let review: Review?
     let store: StoreInOrder
     let orderMenuList: [OrderMenuList]
     let currentOrderStatus: String
@@ -84,7 +84,7 @@ struct Menu: Codable {
 struct OrderStatusTimeline: Codable {
     let status: String
     let completed: Bool
-    let changedAt: String
+    let changedAt: String?
 }
 
 // MARK: - Review

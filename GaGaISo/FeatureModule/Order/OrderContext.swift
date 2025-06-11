@@ -53,8 +53,6 @@ class OrderContext: ObservableObject {
     
     private let networkManager: StrategicNetworkHandler
     
-    @Published private var completedOrders: [String: CompletedOrder] = [:]
-    
     @Published private(set) var orderItems: [OrderItem] = []
     @Published private(set) var storeId: String?
     @Published private(set) var storeName: String?
@@ -63,6 +61,13 @@ class OrderContext: ObservableObject {
     @Published var isProcessingPayment: Bool = false
     @Published var showPaymentSheet: Bool = false
     @Published var currentOrderCode: String?
+    
+    // Order Record
+    @Published private(set) var orderRecords: [OrderDetailDTO] = []
+    @Published private(set) var currentOrders: [OrderDetailDTO] = []
+    @Published private(set) var completedOrders: [OrderDetailDTO] = []
+    @Published private(set) var isLoadingOrders: Bool = false
+    @Published private(set) var orderLoadError: String?
     
     init(networkManager: StrategicNetworkHandler) {
         self.networkManager = networkManager
@@ -185,5 +190,40 @@ extension OrderContext {
         if success {
             clearOrder()
         }
+    }
+}
+
+//MARK: - Order Record
+extension OrderContext {
+    func loadOrderRecords() async {
+        await MainActor.run {
+            isLoadingOrders = true
+            orderLoadError = nil
+        }
+        
+        let result = await networkManager.request(OrderRouter.v1GetOrder, type: OrderDetailsDTO.self)
+        
+        await MainActor.run {
+            switch result {
+            case .success(let orderDetails):
+                self.orderRecords = orderDetails.data.sorted {
+                    // 최신순 정렬 (ISO8601 문자열 비교)
+                    $0.createdAt > $1.createdAt
+                }
+                self.updateOrderSections()
+            case .failure(let error):
+                self.orderLoadError = error.localizedDescription
+            }
+            self.isLoadingOrders = false
+        }
+    }
+    
+    private func updateOrderSections() {
+        currentOrders = orderRecords.filter { $0.currentOrderStatus != "PICKED_UP" }
+        completedOrders = orderRecords.filter { $0.currentOrderStatus == "PICKED_UP" }
+    }
+    
+    func refreshOrderRecords() async {
+        await loadOrderRecords()
     }
 }
