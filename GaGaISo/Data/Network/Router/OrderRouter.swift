@@ -37,7 +37,7 @@ enum OrderRouter: RouterProtocol {
         case .v1PostOrder : return "v1/orders"
         case .v1PutOrderStatus(let orderCode, _): return "v1/orders/\(orderCode)"
         case .v1GetPayment(let orderCode): return "v1/payments/\(orderCode)"
-        case .v1PostPayment: return "v1/payments"
+        case .v1PostPayment: return "v1/payments/validation"
         }
     }
     

@@ -10,6 +10,7 @@ import Toasts
 
 struct OrderView: View {
     @Environment(\.presentToast) private var presentToast
+    private let navigationManager = AppNavigationManager.shared
     
     @StateObject private var viewModel: OrderViewModel
     @State private var dragOffset: CGFloat = 0
@@ -104,19 +105,28 @@ struct OrderView: View {
         .animation(.spring(response: 0.6, dampingFraction: 0.8), value: isExpanded)
         .sheet(isPresented: $viewModel.showPaymentSheet) {
             if let orderCode = viewModel.currentOrderCode {
+                
                 IamportPaymentView(
                     orderCode: orderCode,
                     totalPrice: viewModel.totalPrice,
                     storeName: viewModel.storeName
-                ) { success in
-                    viewModel.handlePaymentCompletion(success: success)
+                ) { response in
                     
-                    let toast = ToastValue(
-                        icon: Image(systemName: success ? "checkmark.circle" : "xmark.circle"),
-                        message: success ? "결제가 완료되었습니다!" : "결제가 취소되었습니다.",
-                        duration: 3.0
-                    )
-                    presentToast(toast)
+                    guard let response, let success = response.success, let uid = response.imp_uid else { return }
+                    
+                    Task {
+                        await viewModel.handlePaymentCompletion(success: success, orderUniqueId: uid)
+                        
+                        let toast = ToastValue(
+                            icon: Image(systemName: success ? "checkmark.circle" : "xmark.circle"),
+                            message: success ? "결제가 완료되었습니다!" : "결제가 취소되었습니다.",
+                            duration: 3.0
+                        )
+                        
+                        presentToast(toast)
+                        
+                        navigationManager.handleOrderCompletion()
+                    }
                 }
             }
         }

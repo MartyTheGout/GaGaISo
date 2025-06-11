@@ -12,7 +12,7 @@ struct IamportPaymentView: UIViewControllerRepresentable {
     let orderCode: String
     let totalPrice: Int
     let storeName: String
-    let onCompletion: (Bool) -> Void
+    let onCompletion: (IamportResponse?) -> Void
     
     func makeUIViewController(context: Context) -> IamportPaymentViewController {
         let viewController = IamportPaymentViewController()
@@ -30,7 +30,7 @@ class IamportPaymentViewController: UIViewController {
     var orderCode: String = ""
     var totalPrice: Int = 0
     var storeName: String = ""
-    var onCompletion: ((Bool) -> Void)?
+    var onCompletion: ((IamportResponse?) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,13 +71,7 @@ class IamportPaymentViewController: UIViewController {
             payment: payment
         ) { [weak self] response in
             DispatchQueue.main.async {
-                if let response = response {
-                    let isSuccess = response.success ?? false
-                    print("imp_uid: \(response.imp_uid)")
-                    self?.onCompletion?(isSuccess)
-                } else {
-                    self?.onCompletion?(false)
-                }
+                self?.onCompletion?(response)
             }
         }
     }

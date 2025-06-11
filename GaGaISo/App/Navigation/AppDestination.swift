@@ -10,7 +10,7 @@ import Foundation
 enum AppDestination: Hashable {
     case home
     case storeDetail(storeId: String)
-    case orderStatus(orderId: String)
+    case orderStatus
     case memuDetail(menu: MenuList)
     case profile
     case notifications

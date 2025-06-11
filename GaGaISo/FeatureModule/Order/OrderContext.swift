@@ -136,9 +136,11 @@ class OrderContext: ObservableObject {
     }
     
     func clearOrder() {
-        orderItems.removeAll()
-        storeId = nil
-        storeName = nil
+        DispatchQueue.main.async { [weak self] in
+            self?.orderItems.removeAll()
+            self?.storeId = nil
+            self?.storeName = nil
+        }
     }
 }
 
@@ -183,11 +185,15 @@ extension OrderContext {
         return result.map {$0.orderCode}.mapError { $0 as Error }
     }
     
-    func handlePaymentCompletion(success: Bool) {
-        showPaymentSheet = false
-        currentOrderCode = nil
+    func handlePaymentCompletion(success: Bool, orderUniqueId: String) async {
+        DispatchQueue.main.async { [weak self]  in
+            self?.showPaymentSheet = false
+            self?.currentOrderCode = nil
+        }
         
-        if success {
+        let validationResult = await validatePayment(with: orderUniqueId)
+        
+        if success && validationResult {
             clearOrder()
         }
     }
@@ -225,5 +231,23 @@ extension OrderContext {
     
     func refreshOrderRecords() async {
         await loadOrderRecords()
+    }
+}
+
+
+//MARK: - Payment
+extension OrderContext {
+    func validatePayment(with paymentUniqueId : String) async -> Bool {
+        let result = await networkManager.request(OrderRouter.v1PostPayment(importId: paymentUniqueId ), type: OrderValidationDTO.self)
+        
+        return await MainActor.run {
+            switch result {
+            case .success(let data):
+                return true
+            case .failure(let error):
+                print(error.localizedDescription)
+                return false
+            }
+        }
     }
 }

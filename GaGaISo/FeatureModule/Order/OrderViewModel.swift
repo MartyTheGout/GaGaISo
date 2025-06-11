@@ -91,7 +91,7 @@ extension OrderViewModel {
         }
     }
     
-    func handlePaymentCompletion(success: Bool) {
-        orderContext.handlePaymentCompletion(success: success)
+    func handlePaymentCompletion(success: Bool, orderUniqueId : String) async {
+        await orderContext.handlePaymentCompletion(success: success, orderUniqueId: orderUniqueId)
     }
 }

@@ -70,23 +70,23 @@ class AppNavigationManager: ObservableObject {
     private func performInternalNavigation(to destination: AppDestination) {
         switch destination {
         case .home:
-            clearAllPaths()
+            break
             
         case .storeDetail:
             homeNavigationPath.append(destination)
             
+        case .memuDetail:
+            homeNavigationPath.append(destination)
+            
         case .orderStatus:
-            clearOrdersPath()
             ordersNavigationPath.append(destination)
             
         case .profile:
-            clearAllPaths()
+            break
             
         case .notifications:
-            clearAllPaths()
+            break
             
-        case .memuDetail:
-            homeNavigationPath.append(destination)
         }
     }
     
@@ -107,8 +107,10 @@ class AppNavigationManager: ObservableObject {
     }
     
     // MARK: - 주문 완료 후 네비게이션
-    func handleOrderCompletion(orderId: String) {
-        navigate(to: .orderStatus(orderId: orderId))
+    func handleOrderCompletion() {
+        DispatchQueue.main.async { [weak self] in
+            self?.selectedTab = .orders
+        }
     }
     
     // MARK: - Push Notification Handling
@@ -119,7 +121,7 @@ class AppNavigationManager: ObservableObject {
             switch type {
             case "order_status":
                 if let orderId = userInfo["order_id"] as? String {
-                    navigate(to: .orderStatus(orderId: orderId))
+                    navigate(to: .orderStatus)
                 }
             case "store_promotion":
                 if let storeId = userInfo["store_id"] as? String {
@@ -149,9 +151,8 @@ class AppNavigationManager: ObservableObject {
                 navigate(to: .storeDetail(storeId: storeId))
             }
         case "order":
-            if let orderId = components?.queryItems?.first(where: { $0.name == "id" })?.value {
-                navigate(to: .orderStatus(orderId: orderId))
-            }
+            navigate(to: .orderStatus)
+            
         default:
             navigate(to: .home)
         }

@@ -120,3 +120,34 @@ struct OrderPostResultDTO: Codable {
         case createdAt, updatedAt
     }
 }
+
+//MARK: - Payment Validation
+struct OrderValidationDTO: Codable {
+    let paymentID: String
+    let orderItem: OrderValidationItem
+    let createdAt, updatedAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case paymentID = "payment_id"
+        case orderItem = "order_item"
+        case createdAt, updatedAt
+    }
+}
+
+// MARK: - OrderItem
+struct OrderValidationItem: Codable {
+    let orderID, orderCode: String
+    let totalPrice: Int
+    let store: StoreInOrder
+    let orderMenuList: [OrderMenuList]
+    let paidAt, createdAt, updatedAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case orderID = "order_id"
+        case orderCode = "order_code"
+        case totalPrice = "total_price"
+        case store
+        case orderMenuList = "order_menu_list"
+        case paidAt, createdAt, updatedAt
+    }
+}
