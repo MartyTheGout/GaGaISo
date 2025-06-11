@@ -83,6 +83,11 @@ struct ContentView: View {
         .onReceive(navigationManager.$profileNavigationPath) { newPath in
             profileNavigationPath = newPath
         }
+        .onChange(of: selectedTab) { _, newTab in
+            if navigationManager.selectedTab != newTab {
+                navigationManager.selectedTab = newTab
+            }
+        }
     }
     
     @ViewBuilder
