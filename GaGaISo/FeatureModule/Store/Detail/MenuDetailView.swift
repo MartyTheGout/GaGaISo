@@ -44,7 +44,9 @@ struct MenuDetailView: View {
             if let menuImage = viewModel.menuImage {
                 Image(uiImage: menuImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: UIScreen.main.bounds.width, height: 300)
+                        .clipped()
             } else if viewModel.isImageLoading {
                 ZStack {
                     Color.gray.opacity(0.3)
@@ -60,9 +62,6 @@ struct MenuDetailView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 300)
-        .clipped()
     }
     
     private var menuInfoSection: some View {
@@ -74,7 +73,7 @@ struct MenuDetailView: View {
             Text(viewModel.menu.description)
                 .pretendardFont(size: .body1)
                 .foregroundColor(.gray60)
-                .lineLimit(nil)
+                .lineLimit(2)
             
             Spacer()
             
