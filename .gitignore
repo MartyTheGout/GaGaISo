@@ -99,5 +99,8 @@ ExternalDatasource.swift
 APIKey.swift
 App.Configuration.xcconfig
 
+# Firebase
+GoogleService-Info.plist
+
 
 # End of https://www.toptal.com/developers/gitignore/api/swift
