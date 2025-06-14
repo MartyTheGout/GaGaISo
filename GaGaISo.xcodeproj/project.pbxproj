@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		406804F52DFD4CB20033B6E0 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 406804F42DFD4CB20033B6E0 /* FirebaseMessaging */; };
 		4068FF8E2DF325C00033B6E0 /* iamport-ios in Frameworks */ = {isa = PBXBuildFile; productRef = 4068FF8D2DF325C00033B6E0 /* iamport-ios */; };
 		407D26832DD32B100043F141 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 407D26822DD32B100043F141 /* .gitignore */; };
 		407D272E2DD342110043F141 /* KakaoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 407D272D2DD342110043F141 /* KakaoSDK */; };
@@ -75,6 +76,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				406804F52DFD4CB20033B6E0 /* FirebaseMessaging in Frameworks */,
 				40C05A5E2DD9CFD60012671F /* Toasts in Frameworks */,
 				407D272E2DD342110043F141 /* KakaoSDK in Frameworks */,
 				40D870762DE4B2BE00BF4D00 /* RealmSwift in Frameworks */,
@@ -151,6 +153,7 @@
 				40D86F842DE4984000BF4D00 /* SocketIO */,
 				40D870752DE4B2BE00BF4D00 /* RealmSwift */,
 				4068FF8D2DF325C00033B6E0 /* iamport-ios */,
+				406804F42DFD4CB20033B6E0 /* FirebaseMessaging */,
 			);
 			productName = GaGaISo;
 			productReference = 407D26712DD32AE90043F141 /* GaGaISo.app */;
@@ -211,6 +214,7 @@
 				40D86F832DE4984000BF4D00 /* XCRemoteSwiftPackageReference "socket" */,
 				40D870742DE4B2BE00BF4D00 /* XCRemoteSwiftPackageReference "realm-swift" */,
 				4068FF8C2DF325C00033B6E0 /* XCRemoteSwiftPackageReference "iamport-ios" */,
+				406804F32DFD4CB20033B6E0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 407D26722DD32AE90043F141 /* Products */;
@@ -535,6 +539,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		406804F32DFD4CB20033B6E0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.14.0;
+			};
+		};
 		4068FF8C2DF325C00033B6E0 /* XCRemoteSwiftPackageReference "iamport-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/iamport/iamport-ios";
@@ -586,6 +598,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		406804F42DFD4CB20033B6E0 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 406804F32DFD4CB20033B6E0 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
 		4068FF8D2DF325C00033B6E0 /* iamport-ios */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4068FF8C2DF325C00033B6E0 /* XCRemoteSwiftPackageReference "iamport-ios" */;
